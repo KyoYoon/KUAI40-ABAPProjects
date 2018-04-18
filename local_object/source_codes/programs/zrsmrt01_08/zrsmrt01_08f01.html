@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_08F01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_08F01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_08F01</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZRSMRT01_08F01</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_INIT_VALUE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_init_value .
+
+  p_carrid = 'LH'.
+
+  s_connid-sign   = 'I'.
+  s_connid-option = 'BT'.
+  s_connid-low    = '0001'.
+  s_connid-high   = '1000'.
+
+  APPEND s_connid.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_BASE_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM get_base_data .
+
+<font color ="#0000FF">*-- Get airline data</font>
+  CLEAR : gt_body.
+
+<font color ="#0000FF">*-- Execute Open SQL</font>
+  SELECT a~carrid b~connid carrname countryfr url cityfrom
+    INTO CORRESPONDING FIELDS OF TABLE gt_body
+<font color ="#0000FF">*-- inner join</font>
+    FROM scarr AS a INNER JOIN spfli AS b
+    ON  a~carrid EQ b~carrid
+<font color ="#0000FF">*-- End of join condition</font>
+    WHERE a~carrid EQ p_carrid
+    AND   b~connid   IN s_connid.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  DISPLAY_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM display_data .
+
+<font color ="#0000FF">*  LOOP AT gt_body INTO gs_body.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    WRITE : sy-vline, gs_body-carrid,</font>
+<font color ="#0000FF">*               sy-vline, gs_body-connid,</font>
+<font color ="#0000FF">*               sy-vline, gs_body-carrname,</font>
+<font color ="#0000FF">*               sy-vline, gs_body-countryfr,</font>
+<font color ="#0000FF">*               sy-vline, gs_body-url,</font>
+<font color ="#0000FF">*               sy-vline, gs_body-cityfrom, sy-vline, sy-uline.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  ENDLOOP.</font>
+
+<font color ="#0000FF">*  LOOP AT gt_body.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    WRITE : sy-vline, gt_body-carrid,</font>
+<font color ="#0000FF">*                   sy-vline, gt_body-connid,</font>
+<font color ="#0000FF">*                   sy-vline, gt_body-carrname,</font>
+<font color ="#0000FF">*                   sy-vline, gt_body-countryfr,</font>
+<font color ="#0000FF">*                   sy-vline, gt_body-url,</font>
+<font color ="#0000FF">*                   sy-vline, gt_body-cityfrom, sy-vline, sy-uline.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  ENDLOOP.</font>
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  DISPLAY_ALV_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM display_alv_data .
+
+  CALL FUNCTION 'REUSE_ALV_FIELDCATALOG_MERGE'
+    EXPORTING
+      i_program_name         = sy-repid
+      i_internal_tabname     = 'GT_BODY'
+<font color ="#0000FF">*      i_structure_name       = 'GS_BODY'</font>
+<font color ="#0000FF">*     I_CLIENT_NEVER_DISPLAY = 'X'</font>
+      i_inclname             = sy-repid
+<font color ="#0000FF">*     I_BYPASSING_BUFFER     =</font>
+<font color ="#0000FF">*     I_BUFFER_ACTIVE        =</font>
+    CHANGING
+      ct_fieldcat            = ct_fieldcat
+    EXCEPTIONS
+      inconsistent_interface = 1
+      program_error          = 2
+      OTHERS                 = 3.
+  IF sy-subrc &lt;&gt; 0.
+<font color ="#0000FF">* Implement suitable error handling here</font>
+  ENDIF.
+
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+<font color ="#0000FF">*     I_INTERFACE_CHECK  = ' '</font>
+<font color ="#0000FF">*     I_BYPASSING_BUFFER = ' '</font>
+<font color ="#0000FF">*     I_BUFFER_ACTIVE    = ' '</font>
+      i_callback_program = sy-repid
+<font color ="#0000FF">*     I_CALLBACK_PF_STATUS_SET          = ' '</font>
+<font color ="#0000FF">*     I_CALLBACK_USER_COMMAND           = ' '</font>
+<font color ="#0000FF">*     I_CALLBACK_TOP_OF_PAGE            = ' '</font>
+<font color ="#0000FF">*     I_CALLBACK_HTML_TOP_OF_PAGE       = ' '</font>
+<font color ="#0000FF">*     I_CALLBACK_HTML_END_OF_LIST       = ' '</font>
+<font color ="#0000FF">*     I_STRUCTURE_NAME   =</font>
+<font color ="#0000FF">*     I_BACKGROUND_ID    = ' '</font>
+<font color ="#0000FF">*     I_GRID_TITLE       =</font>
+<font color ="#0000FF">*     I_GRID_SETTINGS    =</font>
+<font color ="#0000FF">*     IS_LAYOUT          =</font>
+      it_fieldcat        = ct_fieldcat
+<font color ="#0000FF">*     IT_EXCLUDING       =</font>
+<font color ="#0000FF">*     IT_SPECIAL_GROUPS  =</font>
+<font color ="#0000FF">*     IT_SORT            =</font>
+<font color ="#0000FF">*     IT_FILTER          =</font>
+<font color ="#0000FF">*     IS_SEL_HIDE        =</font>
+<font color ="#0000FF">*     I_DEFAULT          = 'X'</font>
+<font color ="#0000FF">*     I_SAVE             = ' '</font>
+<font color ="#0000FF">*     IS_VARIANT         =</font>
+<font color ="#0000FF">*     IT_EVENTS          =</font>
+<font color ="#0000FF">*     IT_EVENT_EXIT      =</font>
+<font color ="#0000FF">*     IS_PRINT           =</font>
+<font color ="#0000FF">*     IS_REPREP_ID       =</font>
+<font color ="#0000FF">*     I_SCREEN_START_COLUMN             = 0</font>
+<font color ="#0000FF">*     I_SCREEN_START_LINE               = 0</font>
+<font color ="#0000FF">*     I_SCREEN_END_COLUMN               = 0</font>
+<font color ="#0000FF">*     I_SCREEN_END_LINE  = 0</font>
+<font color ="#0000FF">*     I_HTML_HEIGHT_TOP  = 0</font>
+<font color ="#0000FF">*     I_HTML_HEIGHT_END  = 0</font>
+<font color ="#0000FF">*     IT_ALV_GRAPHICS    =</font>
+<font color ="#0000FF">*     IT_HYPERLINK       =</font>
+<font color ="#0000FF">*     IT_ADD_FIELDCAT    =</font>
+<font color ="#0000FF">*     IT_EXCEPT_QINFO    =</font>
+<font color ="#0000FF">*     IR_SALV_FULLSCREEN_ADAPTER        =</font>
+<font color ="#0000FF">* IMPORTING</font>
+<font color ="#0000FF">*     E_EXIT_CAUSED_BY_CALLER           =</font>
+<font color ="#0000FF">*     ES_EXIT_CAUSED_BY_USER            =</font>
+    TABLES
+      t_outtab           = gt_body[]
+    EXCEPTIONS
+      program_error      = 1
+      OTHERS             = 2.
+  IF sy-subrc &lt;&gt; 0.
+<font color ="#0000FF">* Implement suitable error handling here</font>
+  ENDIF.
+
+ENDFORM.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

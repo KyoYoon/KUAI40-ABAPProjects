@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_15TOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_15TOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_14TOP</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZRSMRT01_14TOP                                    Report ZRSMRT01_14</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT zrsmrt01_15 MESSAGE-ID k5. " k5 메시지 클래스를 쓰겠다고 미리 선언
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* TABLES Definition</font>
+<font color ="#0000FF">**********************************************************************</font>
+TABLES : bkpf.
+
+TYPES: ty_sel_budat TYPE RANGE OF bkpf-budat.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Local Class Loading</font>
+<font color ="#0000FF">**********************************************************************</font>
+CLASS lcl_event_handler DEFINITION DEFERRED.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Class Instance</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : go_alv_grid        TYPE REF TO cl_gui_alv_grid,          " for main screen
+       go_alv_grid_popup  TYPE REF TO cl_gui_alv_grid,          " for popup screen
+       go_dock_cont       TYPE REF TO cl_gui_docking_container, " docking container object (main)
+       go_cust_cont       TYPE REF TO cl_gui_custom_container.  " custom container object (popup)
+
+DATA : go_event     TYPE REF TO lcl_event_handler.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Internal table with header line (Main)</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : BEGIN OF gt_body OCCURS 0,
+         bukrs TYPE bkpf-bukrs,
+         gjahr TYPE bkpf-gjahr,
+         belnr TYPE bkpf-belnr,
+         blart TYPE bkpf-blart,
+         budat TYPE bkpf-budat,
+         waers TYPE bkpf-waers,
+         xblnr TYPE bkpf-xblnr,
+       END OF gt_body.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Internal Table with No Header Line (Popup)</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : gt_bseg  TYPE TABLE OF bseg,
+       gs_bseg  TYPE bseg.
+
+<font color ="#0000FF">*-- For ALV (Main)</font>
+DATA : gt_fcat   TYPE lvc_t_fcat,  " field catalog internal table
+       gs_fcat   TYPE lvc_s_fcat,  " field catalog structure
+       gs_layout TYPE lvc_s_layo.  " ALV Grid Layout
+
+<font color ="#0000FF">*-- For ALV (Popup)</font>
+DATA : gt_fcat_popup   TYPE lvc_t_fcat,  " field catalog internal table
+       gs_fcat_popup   TYPE lvc_s_fcat,  " field catalog structure
+       gs_layout_popup TYPE lvc_s_layo.  " ALV Grid Layout
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Common Variable</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : gv_okcode  TYPE sy-ucomm.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

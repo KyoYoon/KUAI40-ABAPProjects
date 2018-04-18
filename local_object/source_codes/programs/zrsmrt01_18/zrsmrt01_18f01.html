@@ -1,0 +1,396 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_18F01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_18F01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_18F01</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZRSMRT01_18F01</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_INIT_VALUE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_init_value .
+
+  p_mjahr = sy-datum(4).  " 현재연도
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_MKPF_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM get_mkpf_data .
+
+  CLEAR : gs_mkpf, gt_mkpf.
+
+  SELECT * INTO CORRESPONDING FIELDS OF TABLE gt_mkpf
+    FROM mkpf
+    WHERE mjahr EQ p_mjahr.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  DOUBLE_CLICK</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_E_ROW  text</font>
+<font color ="#0000FF">*      --&gt;P_E_COLUMN  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM double_click  USING pv_row pv_column.
+
+<font color ="#0000FF">*-- Get bseg data</font>
+  PERFORM get_mseg_data USING pv_row.
+
+<font color ="#0000FF">*-- CALL SCREEN 110 (Popup)</font>
+  PERFORM call_popup.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  HOTSPOT_CLICK</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_E_ROW_ID  text</font>
+<font color ="#0000FF">*      --&gt;P_E_COLUMN_ID  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM hotspot_click USING pv_row_id pv_column_id.
+
+<font color ="#0000FF">*-- 전표번호 클릭과 동시에 자재조회화면 (MB03) 으로 이동하기</font>
+<font color ="#0000FF">*-- 클릭한 데이터 관련 레코드 가져오기 (행 번호 이용)</font>
+  CLEAR gs_mkpf.
+  READ TABLE gt_mkpf INTO gs_mkpf INDEX pv_row_id.
+
+<font color ="#0000FF">*-- Using SAP Memory in order to put material number</font>
+<font color ="#0000FF">*-- 매개변수 ID (Parameter Value ID) 에 값을 넣기만 하면 MB03 에서 자동으로 값을 세팅해서 보여줌</font>
+  SET PARAMETER ID 'MBN' FIELD gs_mkpf-mblnr.   " 자재 문서 번호 셋팅
+  SET PARAMETER ID 'MJA' FIELD gs_mkpf-mjahr.   " 자재 문서 연도 셋팅
+
+
+<font color ="#0000FF">*-- Calling a Transaction (Module Pool)</font>
+  CALL TRANSACTION 'MB03' AND SKIP FIRST SCREEN.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  DISPLAY_SCREEN</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM display_screen .
+
+<font color ="#0000FF">*-- Define Field Catalog</font>
+  CLEAR : gt_fcat, gs_fcat.
+  "key  Field      Text          Emphasize
+  PERFORM set_field_catalog USING : 'X'   'MBLNR'    '자재 문서 번호'     'X',
+                                    'X'   'MJAHR'    '자재 문서 연도'  'X',
+                                    ' '   'VGART'  '거래/이벤트 유형'     'X',
+                                    ' '   'BUDAT'  '전기일자'    'X',
+                                    ' '   'AWSYS'  '논리 시스템'    ' ',
+                                    ' '   'TCODE2'    '트랜잭션 코드'      ' '.
+
+<font color ="#0000FF">*-- Display result data on screen 100</font>
+  IF go_dock_cont IS INITIAL.
+
+    PERFORM create_object.
+
+<font color ="#0000FF">*-- ALV 를 위한 event 설치</font>
+    SET HANDLER : go_event-&gt;handle_double_click       FOR go_alv_grid,  " &lt;instance name&gt;-&gt;&lt;instance method name&gt;
+                  lcl_event_handler=&gt;handle_hotspot   FOR go_alv_grid.  " &lt;class name&gt;=&gt;&lt;static method name&gt;
+
+<font color ="#0000FF">*-- ALV layout 설정</font>
+    PERFORM set_layout.
+
+<font color ="#0000FF">*-- Display ALV Grid</font>
+    CALL METHOD go_alv_grid-&gt;set_table_for_first_display
+      EXPORTING
+<font color ="#0000FF">*       i_buffer_active =</font>
+<font color ="#0000FF">*       i_bypassing_buffer            =</font>
+<font color ="#0000FF">*       i_consistency_check           =</font>
+<font color ="#0000FF">*       i_structure_name              = 'GT_BODY'</font>
+<font color ="#0000FF">*       is_variant      =</font>
+        i_save          = 'A'
+        i_default       = 'X'
+        is_layout       = gs_layout
+<font color ="#0000FF">*       is_print        =</font>
+<font color ="#0000FF">*       it_special_groups             =</font>
+<font color ="#0000FF">*       it_toolbar_excluding          =</font>
+<font color ="#0000FF">*       it_hyperlink    =</font>
+<font color ="#0000FF">*       it_alv_graphics =</font>
+<font color ="#0000FF">*       it_except_qinfo =</font>
+<font color ="#0000FF">*       ir_salv_adapter =</font>
+      CHANGING
+        it_outtab       = gt_mkpf
+        it_fieldcatalog = gt_fcat
+<font color ="#0000FF">*       it_sort         =</font>
+<font color ="#0000FF">*       it_filter       =</font>
+<font color ="#0000FF">*      EXCEPTIONS</font>
+<font color ="#0000FF">*       invalid_parameter_combination = 1</font>
+<font color ="#0000FF">*       program_error   = 2</font>
+<font color ="#0000FF">*       too_many_lines  = 3</font>
+<font color ="#0000FF">*       others          = 4</font>
+      .
+
+  ELSE.
+
+<font color ="#0000FF">*-- ALV Grid Refresh</font>
+    CALL METHOD go_alv_grid-&gt;refresh_table_display.
+
+  ENDIF.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_FIELD_CATALOG</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_0049   text</font>
+<font color ="#0000FF">*      --&gt;P_0050   text</font>
+<font color ="#0000FF">*      --&gt;P_0051   text</font>
+<font color ="#0000FF">*      --&gt;P_0052   text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_field_catalog  USING pv_key pv_field pv_text pv_emphasize.
+
+  gs_fcat-key       = pv_key.
+  gs_fcat-fieldname = pv_field.
+  gs_fcat-coltext   = pv_text.
+  gs_fcat-emphasize = pv_emphasize.
+
+  CASE pv_field.
+    WHEN 'MBLNR'.   "Material document number 일 때 hotspot 이벤트 설정
+      gs_fcat-hotspot = 'X'.
+  ENDCASE.
+
+  APPEND gs_fcat TO gt_fcat.
+  CLEAR gs_fcat.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  CREATE_OBJECT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM create_object .
+
+<font color ="#0000FF">*-- create docking container</font>
+  CREATE OBJECT go_dock_cont
+    EXPORTING
+      repid     = sy-repid " report name -&gt; sy-cprog 도 사용가능
+      dynnr     = sy-dynnr " screen name 현재 세션의 screen 번호
+      side      = go_dock_cont-&gt;dock_at_left  " instance name-&gt;instance method '-&gt;'로 참조 (왼쪽 기준)
+      extension = 3000.
+
+<font color ="#0000FF">*-- create alv grid</font>
+  CREATE OBJECT go_alv_grid
+    EXPORTING
+<font color ="#0000FF">*     i_shellstyle      = 0</font>
+<font color ="#0000FF">*     i_lifetime        =</font>
+      i_parent = go_dock_cont.
+
+<font color ="#0000FF">*-- create event</font>
+  CREATE OBJECT go_event.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_LAYOUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_layout .
+
+  gs_layout-zebra       = 'X'.  " Line separator
+  gs_layout-cwidth_opt  = 'X'.  " Width Optimization
+  gs_layout-sel_mode    = 'D'.  " Multi selection
+  gs_layout-grid_title  = 'Material Doc. Info'.  " Grid title
+  gs_layout-smalltitle  = 'X'.  " Small title
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_MSEG_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_PV_ROW  text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM get_mseg_data  USING pv_row.
+
+<font color ="#0000FF">*-- Main Screen 에서 더블 클릭한 관련 행 데이터 관련 레코드 가져오기 (행 번호 이용)</font>
+  CLEAR gs_mkpf.
+  READ TABLE gt_mkpf INTO gs_mkpf INDEX pv_row.
+
+<font color ="#0000FF">*-- Open SQL</font>
+  SELECT * INTO CORRESPONDING FIELDS OF TABLE gt_mseg
+    FROM mseg
+    WHERE mblnr EQ gs_mkpf-mblnr
+    AND   mjahr EQ gs_mkpf-mjahr.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  CALL_POPUP</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM call_popup .
+
+<font color ="#0000FF">*-- Popup</font>
+  CALL SCREEN 110 STARTING AT 03 05.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  DISPLAY_POPUP_SCREEN</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM display_popup_screen .
+
+<font color ="#0000FF">*-- Define Field Catalog for Popup Screen</font>
+  CLEAR : gt_fcat_popup, gs_fcat_popup.
+                                              "key  Field      Text          Emphasize
+  PERFORM set_field_catalog_for_popup USING : 'X'   'MBLNR'    '자재 문서 번호'     'X',
+                                              'X'   'MJAHR'    '자재 문서 연도'  'X',
+                                              ' '   'ZEILE'  '자재 문서 항목'     'X',
+                                              ' '   'MATNR'  '자재 번호'    ' ',
+                                              ' '   'WERKS'    '플랜트'      ' '.
+
+<font color ="#0000FF">*-- Display result data on screen 110</font>
+  IF go_cust_cont IS INITIAL.
+
+    PERFORM create_custom_object.
+
+<font color ="#0000FF">*-- ALV layout 설정</font>
+    PERFORM set_layout_popup.
+
+<font color ="#0000FF">*-- Display ALV Grid</font>
+    CALL METHOD go_alv_grid_popup-&gt;set_table_for_first_display
+      EXPORTING
+<font color ="#0000FF">*       i_buffer_active =</font>
+<font color ="#0000FF">*       i_bypassing_buffer            =</font>
+<font color ="#0000FF">*       i_consistency_check           =</font>
+<font color ="#0000FF">*       i_structure_name              = 'GT_BODY'</font>
+<font color ="#0000FF">*       is_variant      =</font>
+        i_save          = 'A'
+        i_default       = 'X'
+        is_layout       = gs_layout_popup
+<font color ="#0000FF">*       is_print        =</font>
+<font color ="#0000FF">*       it_special_groups             =</font>
+<font color ="#0000FF">*       it_toolbar_excluding          =</font>
+<font color ="#0000FF">*       it_hyperlink    =</font>
+<font color ="#0000FF">*       it_alv_graphics =</font>
+<font color ="#0000FF">*       it_except_qinfo =</font>
+<font color ="#0000FF">*       ir_salv_adapter =</font>
+      CHANGING
+        it_outtab       = gt_mseg
+        it_fieldcatalog = gt_fcat_popup
+<font color ="#0000FF">*       it_sort         =</font>
+<font color ="#0000FF">*       it_filter       =</font>
+<font color ="#0000FF">*      EXCEPTIONS</font>
+<font color ="#0000FF">*       invalid_parameter_combination = 1</font>
+<font color ="#0000FF">*       program_error   = 2</font>
+<font color ="#0000FF">*       too_many_lines  = 3</font>
+<font color ="#0000FF">*       others          = 4</font>
+      .
+
+  ELSE.
+
+<font color ="#0000FF">*-- ALV Grid Refresh</font>
+    CALL METHOD go_alv_grid_popup-&gt;refresh_table_display.
+
+  ENDIF.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  CREATE_CUSTOM_OBJECT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM create_custom_object .
+
+<font color ="#0000FF">*-- create custom container</font>
+  CREATE OBJECT go_cust_cont
+    EXPORTING
+      container_name              = 'POPUP_CONT'.
+
+
+
+<font color ="#0000FF">*-- create alv grid</font>
+  CREATE OBJECT go_alv_grid_popup
+    EXPORTING
+<font color ="#0000FF">*      i_shellstyle      = 0</font>
+<font color ="#0000FF">*      i_lifetime        =</font>
+      i_parent          = go_cust_cont.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_LAYOUT_POPUP</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_layout_popup .
+
+  gs_layout_popup-zebra       = 'X'.  " Line separator
+  gs_layout_popup-cwidth_opt  = 'X'.  " Width Optimization
+  gs_layout_popup-sel_mode    = 'D'.  " Multi selection
+  gs_layout_popup-grid_title  = 'Material Doc. Detail Info'.  " Grid title
+  gs_layout_popup-smalltitle  = 'X'.  " Small title
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_FIELD_CATALOG_FOR_POPUP</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_0298   text</font>
+<font color ="#0000FF">*      --&gt;P_0299   text</font>
+<font color ="#0000FF">*      --&gt;P_0300   text</font>
+<font color ="#0000FF">*      --&gt;P_0301   text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_field_catalog_for_popup USING pv_key pv_field pv_text pv_emphasize.
+
+  gs_fcat_popup-key       = pv_key.
+  gs_fcat_popup-fieldname = pv_field.
+  gs_fcat_popup-coltext   = pv_text.
+  gs_fcat_popup-emphasize = pv_emphasize.
+
+  APPEND gs_fcat_popup TO gt_fcat_popup.
+  CLEAR gs_fcat_popup.
+
+ENDFORM.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>
