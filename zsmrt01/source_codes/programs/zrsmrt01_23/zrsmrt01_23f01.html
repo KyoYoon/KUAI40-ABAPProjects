@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_23F01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_23F01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_23F01</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZRSMRT01_23F01</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_INIT_VALUE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_init_value .
+
+<font color ="#0000FF">*-- Set parameter value</font>
+  p_carrid = 'AA'.
+
+<font color ="#0000FF">*-- Set parameter value</font>
+  p_scarr = 'X'.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_TABLE_NAME</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_table_name .
+
+  IF p_scarr = 'X'.
+    gv_table_name = 'SCARR'.
+  ELSEIF p_spfli = 'X'.
+    gv_table_name = 'SPFLI'.
+  ELSEIF p_sflig = 'X'.
+    gv_table_name = 'SFLIGHT'.
+  ELSEIF p_sbook = 'X'.
+    gv_table_name = 'SBOOK'.
+  ENDIF.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_MAIN_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM get_main_data .
+
+  CLEAR : gt_scarr, gt_spfli, gt_sflight, gt_sbook.
+
+  CASE gv_table_name.
+    WHEN 'SCARR'.
+      ASSIGN gt_scarr TO &lt;fs_tab&gt;.
+    WHEN 'SPFLI'.
+      ASSIGN gt_spfli TO &lt;fs_tab&gt;.
+    WHEN 'SFLIGHT'.
+      ASSIGN gt_sflight TO &lt;fs_tab&gt;.
+    WHEN 'SBOOK'.
+      ASSIGN gt_sbook TO &lt;fs_tab&gt;.
+  ENDCASE.
+
+  IF &lt;fs_tab&gt; IS ASSIGNED.
+
+    SELECT * FROM (gv_table_name) INTO TABLE &lt;fs_tab&gt;
+      WHERE carrid EQ p_carrid.
+
+  ENDIF.
+
+  IF &lt;fs_tab&gt; IS INITIAL.
+    MESSAGE s037 DISPLAY LIKE 'E'.
+    STOP.
+  ENDIF.
+
+
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  DISPLAY_SCREEN</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM display_screen .
+
+<font color ="#0000FF">*-- Define Field Catalog</font>
+  CLEAR : gt_fcat, gs_fcat.
+
+<font color ="#0000FF">*-- Display result data on screen 100</font>
+  IF go_dock_cont IS INITIAL.
+
+    PERFORM create_object.
+
+<font color ="#0000FF">*-- ALV 를 위한 event 설치</font>
+<font color ="#0000FF">*    SET HANDLER : go_event-&gt;handle_double_click       FOR go_alv_grid,  " &lt;instance name&gt;-&gt;&lt;instance method name&gt;</font>
+<font color ="#0000FF">*                  lcl_event_handler=&gt;handle_hotspot   FOR go_alv_grid.  " &lt;class name&gt;=&gt;&lt;static method name&gt;</font>
+
+<font color ="#0000FF">*-- ALV layout 설정</font>
+    PERFORM set_layout.
+
+<font color ="#0000FF">*-- Display ALV Grid</font>
+    CALL METHOD go_alv_grid-&gt;set_table_for_first_display
+      EXPORTING
+<font color ="#0000FF">*       i_buffer_active =</font>
+<font color ="#0000FF">*       i_bypassing_buffer            =</font>
+<font color ="#0000FF">*       i_consistency_check           =</font>
+       i_structure_name              = gv_table_name
+<font color ="#0000FF">*       is_variant      =</font>
+        i_save          = 'A'
+        i_default       = 'X'
+        is_layout       = gs_layout
+<font color ="#0000FF">*       is_print        =</font>
+<font color ="#0000FF">*       it_special_groups             =</font>
+<font color ="#0000FF">*       it_toolbar_excluding          =</font>
+<font color ="#0000FF">*       it_hyperlink    =</font>
+<font color ="#0000FF">*       it_alv_graphics =</font>
+<font color ="#0000FF">*       it_except_qinfo =</font>
+<font color ="#0000FF">*       ir_salv_adapter =</font>
+      CHANGING
+        it_outtab       = &lt;fs_tab&gt;
+<font color ="#0000FF">*        it_fieldcatalog = gt_fcat</font>
+<font color ="#0000FF">*       it_sort         =</font>
+<font color ="#0000FF">*       it_filter       =</font>
+<font color ="#0000FF">*      EXCEPTIONS</font>
+<font color ="#0000FF">*       invalid_parameter_combination = 1</font>
+<font color ="#0000FF">*       program_error   = 2</font>
+<font color ="#0000FF">*       too_many_lines  = 3</font>
+<font color ="#0000FF">*       others          = 4</font>
+      .
+
+  ELSE.
+
+<font color ="#0000FF">*-- ALV Grid Refresh</font>
+    CALL METHOD go_alv_grid-&gt;refresh_table_display.
+
+  ENDIF.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  CREATE_OBJECT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM create_object .
+
+<font color ="#0000FF">*-- create docking container</font>
+  CREATE OBJECT go_dock_cont
+    EXPORTING
+      repid     = sy-repid " report name -&gt; sy-cprog 도 사용가능
+      dynnr     = sy-dynnr " screen name 현재 세션의 screen 번호
+      side      = go_dock_cont-&gt;dock_at_left  " instance name-&gt;instance method '-&gt;'로 참조 (왼쪽 기준)
+      extension = 3000.
+
+<font color ="#0000FF">*-- create alv grid</font>
+  CREATE OBJECT go_alv_grid
+    EXPORTING
+<font color ="#0000FF">*     i_shellstyle      = 0</font>
+<font color ="#0000FF">*     i_lifetime        =</font>
+      i_parent = go_dock_cont.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_LAYOUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_layout .
+
+  gs_layout-zebra       = 'X'.  " Line separator
+  gs_layout-cwidth_opt  = 'X'.  " Width Optimization
+  gs_layout-sel_mode    = 'D'.  " Multi selection
+  gs_layout-grid_title  = 'Flight Info'.  " Grid title
+  gs_layout-smalltitle  = 'X'.  " Small title
+
+ENDFORM.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

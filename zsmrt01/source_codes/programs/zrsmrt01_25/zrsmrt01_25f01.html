@@ -1,0 +1,357 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_25F01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_25F01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_25F01</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZRSMRT01_25F01</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_INIT_VALUE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_init_value .
+
+  p_rbukrs = '1000'.
+  p_ryear = sy-datum(4).
+
+  s_monat-sign = 'I'.
+  s_monat-option = 'BT'.
+  s_monat-low = '01'.
+  s_monat-high = '12'.
+  APPEND s_monat.
+  CLEAR  s_monat.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  GET_MAIN_DATA</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM get_main_data .
+
+  CLEAR : gs_body, gt_body.
+
+<font color ="#0000FF">*-- 계정별로 1년간 월별 금액들을 각각 합친 데이터를 가져온다.</font>
+  SELECT rbukrs ryear racct SUM( hsl01 ) AS hsl01
+               SUM( hsl02 ) AS hsl02
+               SUM( hsl03 ) AS hsl03
+               SUM( hsl04 ) AS hsl04
+               SUM( hsl05 ) AS hsl05
+               SUM( hsl06 ) AS hsl06
+               SUM( hsl07 ) AS hsl07
+               SUM( hsl08 ) AS hsl08
+               SUM( hsl09 ) AS hsl09
+               SUM( hsl10 ) AS hsl10
+               SUM( hsl11 ) AS hsl11
+               SUM( hsl12 ) AS hsl12
+    INTO CORRESPONDING FIELDS OF TABLE gt_body
+    FROM faglflext
+    WHERE rbukrs  EQ p_rbukrs
+    AND   ryear   EQ p_ryear
+    AND   rldnr   EQ '0L'
+    GROUP BY rbukrs ryear racct.
+
+  IF gt_body IS INITIAL.
+    MESSAGE s037 DISPLAY LIKE 'E'.
+    STOP.
+  ENDIF.
+
+
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  MAKE_MAIN_BODY</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM make_main_body .
+
+  DATA : lv_tabix TYPE sy-tabix.
+
+  FIELD-SYMBOLS &lt;lv_month&gt; TYPE any.
+
+  DATA : lv_sum        TYPE bseg-dmbtr, " For summary
+         lv_monat      TYPE bkpf-monat,
+         lv_mon(2)     TYPE n,          " Increase Month
+         lv_var(30),                 " For making variable
+         lv_result(13).
+<font color ="#0000FF">*-- Get data</font>
+  CLEAR : gs_body, lv_sum, lv_mon.
+
+  IF s_monat-high IS INITIAL.
+
+    LOOP AT gt_body INTO gs_body.
+
+      lv_tabix = sy-tabix.
+
+      lv_mon = s_monat-low.
+      CONCATENATE 'gs_body-hsl' lv_mon INTO lv_var. "gs_body-hsl01
+      ASSIGN (lv_var) TO &lt;lv_month&gt;.
+
+      lv_sum = lv_sum + &lt;lv_month&gt;.
+
+      gs_body-dmbtr = lv_sum.
+
+      MODIFY gt_body FROM gs_body INDEX lv_tabix TRANSPORTING dmbtr.
+
+      CLEAR lv_sum.
+
+    ENDLOOP.
+
+
+
+  ELSE.
+
+    lv_monat = s_monat-high - s_monat-low.
+
+    lv_monat = lv_monat + 1.
+
+
+
+    LOOP AT gt_body INTO gs_body.
+
+      lv_tabix = sy-tabix.
+      lv_mon = s_monat-low.
+
+<font color ="#0000FF">*-- Summary - 입력한 구간만큼 반복</font>
+      DO lv_monat TIMES.
+
+<font color ="#0000FF">*-- Make a variable</font>
+        CLEAR : lv_var.
+
+        CONCATENATE 'gs_body-hsl' lv_mon INTO lv_var. "gs_body-hsl01
+        ASSIGN (lv_var) TO &lt;lv_month&gt;.
+
+        lv_sum = lv_sum + &lt;lv_month&gt;.
+
+        lv_mon = lv_mon + 1. " 월 정보 증가 -&gt; 00 + 1 = 01
+
+      ENDDO.
+
+      gs_body-dmbtr = lv_sum.
+
+      MODIFY gt_body FROM gs_body INDEX lv_tabix TRANSPORTING dmbtr.
+
+      CLEAR lv_sum.
+
+    ENDLOOP.
+
+
+
+  ENDIF.
+
+
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  DISPLAY_SCREEN</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM display_screen .
+
+<font color ="#0000FF">*DATA : BEGIN OF gs_body,</font>
+<font color ="#0000FF">*         rbukrs TYPE faglflext-rbukrs,</font>
+<font color ="#0000FF">*         ryear  TYPE bkpf-gjahr,</font>
+<font color ="#0000FF">*         racct  TYPE faglflext-racct,</font>
+<font color ="#0000FF">*         hsl01  TYPE faglflext-hsl01,</font>
+<font color ="#0000FF">*         hsl02  TYPE faglflext-hsl02,</font>
+<font color ="#0000FF">*         hsl03  TYPE faglflext-hsl03,</font>
+<font color ="#0000FF">*         hsl04  TYPE faglflext-hsl04,</font>
+<font color ="#0000FF">*         hsl05  TYPE faglflext-hsl05,</font>
+<font color ="#0000FF">*         hsl06  TYPE faglflext-hsl06,</font>
+<font color ="#0000FF">*         hsl07  TYPE faglflext-hsl07,</font>
+<font color ="#0000FF">*         hsl08  TYPE faglflext-hsl08,</font>
+<font color ="#0000FF">*         hsl09  TYPE faglflext-hsl09,</font>
+<font color ="#0000FF">*         hsl10  TYPE faglflext-hsl10,</font>
+<font color ="#0000FF">*         hsl11  TYPE faglflext-hsl11,</font>
+<font color ="#0000FF">*         hsl12  TYPE faglflext-hsl12,</font>
+<font color ="#0000FF">*         dmbtr  TYPE bsis-dmbtr,</font>
+<font color ="#0000FF">*       END OF gs_body.</font>
+<font color ="#0000FF">*DATA : gt_body LIKE TABLE OF gs_body.</font>
+
+  DATA : lv_str TYPE string.
+
+  lv_str = '현지 통화 금액 합계'.
+
+  IF s_monat-high IS INITIAL.
+
+    lv_str = lv_str && ' (' && s_monat-low && '월)'.
+
+  ELSE.
+
+    lv_str = lv_str && ' (' && s_monat-low && '월' && ' ~ ' && ' ' && s_monat-high && '월)'.
+
+  ENDIF.
+
+<font color ="#0000FF">*-- Define Field Catalog</font>
+  CLEAR : gt_fcat, gs_fcat.
+  "key  Field      Text          Emphasize
+  PERFORM set_field_catalog USING : 'X'   'RBUKRS'    '회사 코드'     'X',
+                                    'X'   'RYEAR'    '회계연도'      'X',
+                                    'X'   'RACCT'  '계정 번호'      'X',
+                                    ' '   'HSL01'    '1월'     ' ',
+                                    ' '   'HSL02'    '2월'     ' ',
+                                    ' '   'HSL03'    '3월'     ' ',
+                                    ' '   'HSL04'    '4월'     ' ',
+                                    ' '   'HSL05'    '5월'     ' ',
+                                    ' '   'HSL06'    '6월'     ' ',
+                                    ' '   'HSL07'    '7월'     ' ',
+                                    ' '   'HSL08'    '8월'     ' ',
+                                    ' '   'HSL09'    '9월'     ' ',
+                                    ' '   'HSL10'    '10월'     ' ',
+                                    ' '   'HSL11'    '11월'     ' ',
+                                    ' '   'HSL12'    '12월'     ' ',
+                                    ' '   'DMBTR'  lv_str    ' '.
+
+
+<font color ="#0000FF">*-- Display result data on screen 100</font>
+  IF go_dock_cont IS INITIAL.
+
+    PERFORM create_object.
+
+<font color ="#0000FF">*-- ALV 를 위한 event 설치</font>
+<font color ="#0000FF">*    SET HANDLER : go_event-&gt;handle_double_click       FOR go_alv_grid,  " &lt;instance name&gt;-&gt;&lt;instance method name&gt;</font>
+<font color ="#0000FF">*                  lcl_event_handler=&gt;handle_hotspot   FOR go_alv_grid.  " &lt;class name&gt;=&gt;&lt;static method name&gt;</font>
+
+<font color ="#0000FF">*-- ALV layout 설정</font>
+    PERFORM set_layout.
+
+<font color ="#0000FF">*-- Display ALV Grid</font>
+    CALL METHOD go_alv_grid-&gt;set_table_for_first_display
+      EXPORTING
+<font color ="#0000FF">*       i_buffer_active =</font>
+<font color ="#0000FF">*       i_bypassing_buffer            =</font>
+<font color ="#0000FF">*       i_consistency_check           =</font>
+<font color ="#0000FF">*       i_structure_name              = 'GT_BODY'</font>
+<font color ="#0000FF">*       is_variant      =</font>
+        i_save          = 'A'
+        i_default       = 'X'
+        is_layout       = gs_layout
+<font color ="#0000FF">*       is_print        =</font>
+<font color ="#0000FF">*       it_special_groups             =</font>
+<font color ="#0000FF">*       it_toolbar_excluding          =</font>
+<font color ="#0000FF">*       it_hyperlink    =</font>
+<font color ="#0000FF">*       it_alv_graphics =</font>
+<font color ="#0000FF">*       it_except_qinfo =</font>
+<font color ="#0000FF">*       ir_salv_adapter =</font>
+      CHANGING
+        it_outtab       = gt_body
+        it_fieldcatalog = gt_fcat
+<font color ="#0000FF">*       it_sort         =</font>
+<font color ="#0000FF">*       it_filter       =</font>
+<font color ="#0000FF">*      EXCEPTIONS</font>
+<font color ="#0000FF">*       invalid_parameter_combination = 1</font>
+<font color ="#0000FF">*       program_error   = 2</font>
+<font color ="#0000FF">*       too_many_lines  = 3</font>
+<font color ="#0000FF">*       others          = 4</font>
+      .
+
+  ELSE.
+
+<font color ="#0000FF">*-- ALV Grid Refresh</font>
+    CALL METHOD go_alv_grid-&gt;refresh_table_display.
+
+  ENDIF.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_FIELD_CATALOG</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*      --&gt;P_0274   text</font>
+<font color ="#0000FF">*      --&gt;P_0275   text</font>
+<font color ="#0000FF">*      --&gt;P_0276   text</font>
+<font color ="#0000FF">*      --&gt;P_0277   text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_field_catalog  USING pv_key pv_field pv_text pv_emphasize.
+
+  gs_fcat-key       = pv_key.
+  gs_fcat-fieldname = pv_field.
+  gs_fcat-coltext   = pv_text.
+  gs_fcat-emphasize = pv_emphasize.
+
+<font color ="#0000FF">*  CASE pv_field.</font>
+<font color ="#0000FF">*    WHEN 'DMBTR'.</font>
+<font color ="#0000FF">*      gs_fcat-cfieldname = 'WAERS'. "통화 단위 이름을 DMBTR에 할당</font>
+<font color ="#0000FF">*    WHEN 'BELNR'.   "FI document number 일 때 hotspot 이벤트 설정</font>
+<font color ="#0000FF">*      gs_fcat-hotspot = 'X'.</font>
+<font color ="#0000FF">*  ENDCASE.</font>
+
+  APPEND gs_fcat TO gt_fcat.
+  CLEAR gs_fcat.
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  CREATE_OBJECT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM create_object .
+
+<font color ="#0000FF">*-- create docking container</font>
+  CREATE OBJECT go_dock_cont
+    EXPORTING
+      repid     = sy-repid " report name -&gt; sy-cprog 도 사용가능
+      dynnr     = sy-dynnr " screen name 현재 세션의 screen 번호
+      side      = go_dock_cont-&gt;dock_at_left  " instance name-&gt;instance method '-&gt;'로 참조 (왼쪽 기준)
+      extension = 3000.
+
+<font color ="#0000FF">*-- create alv grid</font>
+  CREATE OBJECT go_alv_grid
+    EXPORTING
+<font color ="#0000FF">*     i_shellstyle      = 0</font>
+<font color ="#0000FF">*     i_lifetime        =</font>
+      i_parent = go_dock_cont.
+
+<font color ="#0000FF">*-- create event</font>
+<font color ="#0000FF">*  CREATE OBJECT go_event.</font>
+
+ENDFORM.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&      Form  SET_LAYOUT</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*       text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+<font color ="#0000FF">*  --&gt;  p1        text</font>
+<font color ="#0000FF">*  &lt;--  p2        text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+FORM set_layout .
+
+  gs_layout-zebra       = 'X'.  " Line separator
+  gs_layout-cwidth_opt  = 'X'.  " Width Optimization
+  gs_layout-sel_mode    = 'D'.  " Multi selection
+  gs_layout-grid_title  = 'Financial Doc. Info'.  " Grid title
+  gs_layout-smalltitle  = 'X'.  " Small title
+
+ENDFORM.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

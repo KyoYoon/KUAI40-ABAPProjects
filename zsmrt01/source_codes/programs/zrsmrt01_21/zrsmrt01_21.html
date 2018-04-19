@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_21</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_21</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  재무데이터 조회 Report (Call Function)</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report  ZRSMRT01_21</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+include <a href ="zrsmrt01_21top.html">ZRSMRT01_21TOP</a>.  " global Data
+include <a href ="zrsmrt01_21c01.html">ZRSMRT01_21C01</a>.  " Selection Screen
+include <a href ="zrsmrt01_21s01.html">ZRSMRT01_21S01</a>.  " Selection Screen
+include <a href ="zrsmrt01_21o01.html">ZRSMRT01_21O01</a>.  " PBO-Modules
+include <a href ="zrsmrt01_21i01.html">ZRSMRT01_21I01</a>.  " PAI-Modules
+include <a href ="zrsmrt01_21f01.html">ZRSMRT01_21F01</a>.  " FORM-Routines
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* INITIALIZATION</font>
+<font color ="#0000FF">**********************************************************************</font>
+INITIALIZATION.
+  PERFORM set_init_value.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* START-OF-SELECTION</font>
+<font color ="#0000FF">**********************************************************************</font>
+START-OF-SELECTION.
+<font color ="#0000FF">*  PERFORM get_flight_list.</font>
+<font color ="#0000FF">*  PERFORM get_spfli_list.</font>
+  PERFORM get_main_data.
+  PERFORM make_main_body.
+
+  IF sy-subrc EQ 0.
+
+    CALL SCREEN 100.
+
+<font color ="#0000FF">*-- For test</font>
+<font color ="#0000FF">*    DATA : lv_report TYPE sy-repid.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    lv_report = 'ZRSMRT01_20'.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*    SUBMIT (lv_report) VIA SELECTION-SCREEN.   " (local variable) 는 자체 값이 되어버림</font>
+
+  ELSE.
+    MESSAGE s037 DISPLAY LIKE 'E'.
+<font color ="#0000FF">*    MESSAGE s001(f5) DISPLAY LIKE 'W'.</font>
+<font color ="#0000FF">*    MESSAGE i001 WITH text-t01 p_bukrs DISPLAY LIKE 'W'.</font>
+<font color ="#0000FF">*    MESSAGE w001 DISPLAY LIKE 'W'.</font>
+<font color ="#0000FF">*    MESSAGE e001 DISPLAY LIKE 'W'.</font>
+
+  ENDIF.
+
+<font color ="#0000FF">*GUI Texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* TITLE100 --&gt; 재무데이터 조회 결과</font>
+<font color ="#0000FF">* TITLE110 --&gt; 재무데이터 상세정보</font>
+
+<font color ="#0000FF">*Text elements</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* T01 조회조건</font>
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* P_BUKRS D       .</font>
+<font color ="#0000FF">* P_GJAHR D       .</font>
+<font color ="#0000FF">* S_BUDAT D       .</font>
+
+
+<font color ="#0000FF">*Messages</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: K5</font>
+<font color ="#0000FF">*037   데이타가 없습니다.</font>
+<font color ="#0000FF">*102   데이터를 저장했습니다.</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

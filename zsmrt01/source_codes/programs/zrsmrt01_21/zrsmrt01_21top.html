@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_21TOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_21TOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_21TOP</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZRSMRT01_21TOP                                    Report ZRSMRT01_21</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT zrsmrt01_21 MESSAGE-ID k5. " k5 메시지 클래스를 쓰겠다고 미리 선언
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* TABLES Definition</font>
+<font color ="#0000FF">**********************************************************************</font>
+TABLES : bkpf, bsik.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Local Class Loading</font>
+<font color ="#0000FF">**********************************************************************</font>
+CLASS lcl_event_handler DEFINITION DEFERRED.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Class Instance</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : go_alv_grid       TYPE REF TO cl_gui_alv_grid,          " for main screen
+       go_alv_grid_popup TYPE REF TO cl_gui_alv_grid,          " for popup screen
+       go_dock_cont      TYPE REF TO cl_gui_docking_container, " docking container object (main)
+       go_cust_cont      TYPE REF TO cl_gui_custom_container.  " custom container object (popup)
+
+DATA : go_event     TYPE REF TO lcl_event_handler.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Internal Table with No Header Line (Main)</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : BEGIN OF gs_body,
+         bukrs TYPE bkpf-bukrs,
+         gjahr TYPE bkpf-gjahr,
+         belnr TYPE bkpf-belnr,
+         blart TYPE bkpf-blart,
+         budat TYPE bkpf-budat,
+         bktxt TYPE bkpf-bktxt,
+         lifnr TYPE bsik-lifnr,
+         name1 TYPE lfa1-name1,   " for all entries 로 가지고 와야 함
+         hkont TYPE bsik-hkont,
+         txt50 TYPE skat-txt50,   " for all entries 로 가지고 와야 함
+         dmbtr TYPE bsik-dmbtr,
+         waers TYPE bkpf-waers,
+       END OF gs_body.
+DATA : gt_body LIKE TABLE OF gs_body.
+
+<font color ="#0000FF">*-- for NAME1</font>
+DATA : gt_lfa1 TYPE TABLE OF lfa1,
+       gs_lfa1 TYPE lfa1.
+
+<font color ="#0000FF">*-- for TXT50</font>
+DATA : gt_skat TYPE TABLE OF skat,
+       gs_skat TYPE skat.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Internal Table with No Header Line (Popup)</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : gt_bseg TYPE TABLE OF bseg,
+       gs_bseg TYPE bseg.
+
+<font color ="#0000FF">*-- For ALV (Main)</font>
+DATA : gt_fcat   TYPE lvc_t_fcat,  " field catalog internal table
+       gs_fcat   TYPE lvc_s_fcat,  " field catalog structure
+       gs_layout TYPE lvc_s_layo.  " ALV Grid Layout
+
+<font color ="#0000FF">*-- For ALV (Popup)</font>
+DATA : gt_fcat_popup   TYPE lvc_t_fcat,  " field catalog internal table
+       gs_fcat_popup   TYPE lvc_s_fcat,  " field catalog structure
+       gs_layout_popup TYPE lvc_s_layo.  " ALV Grid Layout
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Common Variable</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : gv_flag.
+DATA : gv_okcode  TYPE sy-ucomm.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

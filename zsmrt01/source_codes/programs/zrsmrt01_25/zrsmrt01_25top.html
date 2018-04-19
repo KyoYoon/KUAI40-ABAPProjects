@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_25TOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_25TOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_25TOP</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZRSMRT01_25TOP                                    Report ZRSMRT01_25</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT zrsmrt01_25 MESSAGE-ID k5. " k5 메시지 클래스를 쓰겠다고 미리 선언
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* TABLES Definition</font>
+<font color ="#0000FF">**********************************************************************</font>
+TABLES : bkpf.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Local Class Loading</font>
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">*CLASS lcl_event_handler DEFINITION DEFERRED.</font>
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Class Instance</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : go_alv_grid       TYPE REF TO cl_gui_alv_grid,          " for main screen
+       go_alv_grid_popup TYPE REF TO cl_gui_alv_grid,          " for popup screen
+       go_dock_cont      TYPE REF TO cl_gui_docking_container, " docking container object (main)
+       go_cust_cont      TYPE REF TO cl_gui_custom_container.  " custom container object (popup)
+
+<font color ="#0000FF">*DATA : go_event     TYPE REF TO lcl_event_handler.</font>
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Internal Table with No Header Line (Main)</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : BEGIN OF gs_body,
+         rbukrs TYPE faglflext-rbukrs,
+         ryear  TYPE bkpf-gjahr,
+         racct  TYPE faglflext-racct,
+         hsl01  TYPE faglflext-hsl01,
+         hsl02  TYPE faglflext-hsl02,
+         hsl03  TYPE faglflext-hsl03,
+         hsl04  TYPE faglflext-hsl04,
+         hsl05  TYPE faglflext-hsl05,
+         hsl06  TYPE faglflext-hsl06,
+         hsl07  TYPE faglflext-hsl07,
+         hsl08  TYPE faglflext-hsl08,
+         hsl09  TYPE faglflext-hsl09,
+         hsl10  TYPE faglflext-hsl10,
+         hsl11  TYPE faglflext-hsl11,
+         hsl12  TYPE faglflext-hsl12,
+         dmbtr  TYPE bsis-dmbtr,
+       END OF gs_body.
+DATA : gt_body LIKE TABLE OF gs_body.
+
+<font color ="#0000FF">*-- for NAME1</font>
+<font color ="#0000FF">*DATA : gt_t001w TYPE TABLE OF t001w,</font>
+<font color ="#0000FF">*       gs_t001w TYPE t001w.</font>
+
+<font color ="#0000FF">*-- for GTEXT</font>
+<font color ="#0000FF">*DATA : gt_tgsbt TYPE TABLE OF tgsbt,</font>
+<font color ="#0000FF">*       gs_tgsbt TYPE tgsbt.</font>
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Internal Table with No Header Line (Popup)</font>
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">*DATA : gt_bseg TYPE TABLE OF bseg,</font>
+<font color ="#0000FF">*       gs_bseg TYPE bseg.</font>
+
+<font color ="#0000FF">*-- For ALV (Main)</font>
+DATA : gt_fcat   TYPE lvc_t_fcat,  " field catalog internal table
+       gs_fcat   TYPE lvc_s_fcat,  " field catalog structure
+       gs_layout TYPE lvc_s_layo.  " ALV Grid Layout
+
+<font color ="#0000FF">*-- For ALV (Popup)</font>
+<font color ="#0000FF">*DATA : gt_fcat_popup   TYPE lvc_t_fcat,  " field catalog internal table</font>
+<font color ="#0000FF">*       gs_fcat_popup   TYPE lvc_s_fcat,  " field catalog structure</font>
+<font color ="#0000FF">*       gs_layout_popup TYPE lvc_s_layo.  " ALV Grid Layout</font>
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Common Variable</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : gv_flag.
+DATA : gv_okcode  TYPE sy-ucomm.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>
