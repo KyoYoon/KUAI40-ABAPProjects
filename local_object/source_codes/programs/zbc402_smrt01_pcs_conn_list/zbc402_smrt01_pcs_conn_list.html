@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZBC402_SMRT01_PCS_CONN_LIST</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZBC402_SMRT01_PCS_CONN_LIST</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  항공기 운항일정 조회 Report</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report ZBC402_SMRT01_PCS_CONN_LIST</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT ZBC402_SMRT01_PCS_CONN_LIST MESSAGE-ID BC402.
+
+TYPES: BEGIN OF GTY_S_CONN,
+         CARRID   TYPE SPFLI-CARRID,
+         CONNID   TYPE SPFLI-CONNID,
+         CITYFROM TYPE SPFLI-CITYFROM,
+         CITYTO   TYPE SPFLI-CITYTO,
+         DEPTIME  TYPE SPFLI-DEPTIME,
+         ARRTIME  TYPE SPFLI-ARRTIME,
+         PERIOD   TYPE SPFLI-PERIOD,
+       END OF GTY_S_CONN.
+
+TYPES GTY_T_CONN TYPE STANDARD TABLE OF GTY_S_CONN WITH NON-UNIQUE DEFAULT KEY.
+
+DATA: GT_CONN TYPE GTY_T_CONN,
+      GV_MSG  TYPE STRING,
+      GO_ALV  TYPE REF TO CL_SALV_TABLE,
+      GO_EVT  TYPE REF TO CL_SALV_EVENTS_TABLE,
+      GO_FCT  TYPE REF TO CL_SALV_FUNCTIONS_LIST,
+      GX_MSG  TYPE REF TO CX_SALV_MSG.
+
+CLASS LCL_EVENT_HANDLER DEFINITION.
+  PUBLIC SECTION.
+    CLASS-METHODS: ON_DOUBLE_CLICK FOR EVENT DOUBLE_CLICK OF IF_SALV_EVENTS_ACTIONS_TABLE
+      IMPORTING ROW COLUMN.
+ENDCLASS.
+
+CLASS LCL_EVENT_HANDLER IMPLEMENTATION.
+  METHOD ON_DOUBLE_CLICK.
+    DATA: LT_BDC  TYPE TABLE OF BDCDATA,
+          LS_BDC  TYPE BDCDATA,
+          LS_CONN LIKE LINE OF GT_CONN.
+
+    READ TABLE GT_CONN INTO LS_CONN INDEX ROW.
+
+    CASE COLUMN.
+      WHEN 'CARRID'.
+      WHEN OTHERS.
+        SUBMIT ZBC402_INS_FLIGHT_LIST_OSQL
+        AND RETURN WITH PA_CAR EQ LS_CONN-CARRID
+        WITH SO_CON EQ LS_CONN-CONNID.
+    ENDCASE.
+  ENDMETHOD.
+ENDCLASS.
+
+START-OF-SELECTION.
+  SELECT CARRID CONNID CITYFROM CITYTO DEPTIME ARRTIME PERIOD
+    FROM SPFLI INTO TABLE GT_CONN.
+
+<font color ="#0000FF">* CL_SALV_TABLE : 1억 5천만건정도 되는 빅데이터를 보여줄 때 쓰는 클래스</font>
+  TRY.
+      CALL METHOD CL_SALV_TABLE=&gt;FACTORY
+        IMPORTING
+          R_SALV_TABLE = GO_ALV
+        CHANGING
+          T_TABLE      = GT_CONN.
+
+    CATCH CX_SALV_MSG INTO GX_MSG.
+      GV_MSG = GX_MSG-&gt;GET_TEXT( ).
+      MESSAGE GV_MSG TYPE 'E'.
+  ENDTRY.
+
+  GO_EVT = GO_ALV-&gt;GET_EVENT( ).
+
+  SET HANDLER LCL_EVENT_HANDLER=&gt;ON_DOUBLE_CLICK FOR GO_EVT.
+
+  GO_ALV-&gt;DISPLAY( ).
+
+
+<font color ="#0000FF">*Messages</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: BC402</font>
+<font color ="#0000FF">*YPE</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

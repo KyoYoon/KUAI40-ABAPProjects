@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_05_ALVTOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_05_ALVTOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_05TOP_ALV</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZRSMRT01_05_ALVTOP                                    Report ZRSMRT01_05_ALV</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT zrsmrt01_05_alv LINE-SIZE 1023.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* TYPE-POOLS declaration</font>
+<font color ="#0000FF">**********************************************************************</font>
+TYPE-POOLS : slis.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* TABLES declaration</font>
+<font color ="#0000FF">**********************************************************************</font>
+TABLES: spfli.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Internal table and Work area</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : gt_spfli LIKE TABLE OF spfli, " Internal Table with No Header
+       gs_spfli TYPE spfli.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* FIELDCAT declaration</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : gt_fieldcat TYPE  slis_t_fieldcat_alv.
+data: go_alv type REF TO cl_salv_table.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

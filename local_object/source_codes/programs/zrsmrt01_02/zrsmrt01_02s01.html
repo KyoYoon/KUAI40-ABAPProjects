@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_02S01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_02S01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_02S01</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZRSMRT01_02S01</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+SELECTION-SCREEN BEGIN OF BLOCK pa1 WITH FRAME TITLE TEXT-t01. " TITLE 옆에 Text Symbol을 쓴다.
+
+PARAMETERS : p_carrid TYPE scarr-carrid DEFAULT 'AA' MODIF ID car,
+             p_connid TYPE spfli-connid              MODIF ID con.
+
+SELECT-OPTIONS s_ctryfr FOR spfli-countryfr.
+
+SELECTION-SCREEN END OF BLOCK pa1.
+
+SELECTION-SCREEN BEGIN OF BLOCK pa2 WITH FRAME TITLE TEXT-t02.
+
+PARAMETERS : p_aa AS CHECKBOX,
+             p_dl AS CHECKBOX.
+
+SELECTION-SCREEN SKIP.
+
+PARAMETERS : p_air RADIOBUTTON GROUP gr1 USER-COMMAND uc, " USER-COMMAND 옆에 있는 글자는 3 글자 이하로만 주면 됨
+             p_con RADIOBUTTON GROUP gr1,
+             p_all RADIOBUTTON GROUP gr1.
+
+SELECTION-SCREEN END OF BLOCK pa2.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

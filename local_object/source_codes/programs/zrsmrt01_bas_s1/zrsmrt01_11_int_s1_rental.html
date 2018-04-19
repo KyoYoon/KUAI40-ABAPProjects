@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_11_INT_S1_RENTAL</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_11_INT_S1_RENTAL</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZBC401_11_INT_S1_RENTAL</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class LCL_VEHICLE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_VEHICLE DEFINITION.
+  PUBLIC SECTION.
+    METHODS:
+      CONSTRUCTOR
+        IMPORTING
+          IV_MAKE TYPE STRING,
+      DISPLAY_ATTRIBUTES.
+    CLASS-METHODS:
+      GET_COUNT
+        EXPORTING
+          EV_COUNT TYPE I.
+    EVENTS:
+      VEHICLE_CREATED.
+
+  PRIVATE SECTION.
+    DATA:
+          MV_MAKE TYPE STRING.
+    CLASS-DATA:
+      GV_N_O_VEHICLES TYPE I.
+ENDCLASS.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class (Implementation)  LCL_VEHICLE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_VEHICLE IMPLEMENTATION.
+  METHOD CONSTRUCTOR.
+    MV_MAKE = IV_MAKE.
+    ADD 1 TO GV_N_O_VEHICLES.
+    RAISE EVENT VEHICLE_CREATED.
+  ENDMETHOD.
+
+  METHOD DISPLAY_ATTRIBUTES.
+    WRITE MV_MAKE.
+  ENDMETHOD.
+
+  METHOD GET_COUNT.
+    EV_COUNT = GV_N_O_VEHICLES.
+  ENDMETHOD.
+ENDCLASS.               "LCL_VEHICLE
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class LCL_TRUCK</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_TRUCK DEFINITION INHERITING FROM LCL_VEHICLE.
+  PUBLIC SECTION.
+    METHODS:
+      CONSTRUCTOR
+        IMPORTING
+          IV_MAKE  TYPE STRING
+          IV_CARGO TYPE S_PLAN_CAR,
+      DISPLAY_ATTRIBUTES REDEFINITION.
+
+  PRIVATE SECTION.
+    DATA:
+          MV_CARGO TYPE S_PLAN_CAR.
+ENDCLASS.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class (Implementation)  LCL_TRUCK</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_TRUCK IMPLEMENTATION.
+  METHOD CONSTRUCTOR.
+    SUPER-&gt;CONSTRUCTOR( IV_MAKE ).
+    MV_CARGO = IV_CARGO.
+  ENDMETHOD.
+
+  METHOD DISPLAY_ATTRIBUTES.
+    WRITE: / ICON_WS_TRUCK AS ICON.
+    SUPER-&gt;DISPLAY_ATTRIBUTES( ).
+    WRITE:
+      20 'MAX. CARGO:'(005),
+      MV_CARGO.
+    ULINE.
+  ENDMETHOD.
+ENDCLASS.               "LCL_TRUCK
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class LCL_BUS</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_BUS DEFINITION INHERITING FROM LCL_VEHICLE.
+  PUBLIC SECTION.
+    METHODS:
+      CONSTRUCTOR
+        IMPORTING
+          IV_MAKE       TYPE STRING
+          IV_PASSENGERS TYPE I,
+      DISPLAY_ATTRIBUTES REDEFINITION.
+
+  PRIVATE SECTION.
+    DATA:
+          MV_PASSENGERS TYPE I.
+ENDCLASS.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class (Implementation)  LCL_BUS</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_BUS IMPLEMENTATION.
+  METHOD CONSTRUCTOR.
+    SUPER-&gt;CONSTRUCTOR( IV_MAKE ).
+    MV_PASSENGERS = IV_PASSENGERS.
+  ENDMETHOD.
+
+  METHOD DISPLAY_ATTRIBUTES.
+    WRITE: / ICON_TRANSPORTATION_MODE AS ICON.
+    SUPER-&gt;DISPLAY_ATTRIBUTES( ).
+    WRITE:
+     20 'MAX. PASSENGERS: '(006),
+     MV_PASSENGERS.
+    ULINE.
+  ENDMETHOD.
+ENDCLASS.               "LCL_BUS
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class LCL_RENTAL</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_RENTAL DEFINITION.
+  PUBLIC SECTION.
+    INTERFACES:
+      ZIF_11_PARTNER.
+
+    METHODS:
+      CONSTRUCTOR
+        IMPORTING IV_NAME TYPE STRING,
+        ON_VEHICLE_CREATED FOR EVENT VEHICLE_CREATED OF LCL_VEHICLE
+        IMPORTING
+          SENDER,
+      DISPLAY_ATTRIBUTES.
+
+  PRIVATE SECTION.
+    DATA:
+      MV_NAME     TYPE STRING,
+      MT_VEHICLES TYPE TABLE OF REF TO LCL_VEHICLE.
+ENDCLASS.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class (Implementation)  LCL_RENTAL</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_RENTAL IMPLEMENTATION.
+  METHOD ZIF_11_PARTNER~DISPLAY_PARTNER.
+    DISPLAY_ATTRIBUTES( ).
+  ENDMETHOD.
+
+  METHOD CONSTRUCTOR.
+    MV_NAME = IV_NAME.
+    SET HANDLER ON_VEHICLE_CREATED FOR ALL INSTANCES.
+    RAISE EVENT ZIF_11_PARTNER~PARTNER_CREATED.
+  ENDMETHOD.
+
+  METHOD ON_VEHICLE_CREATED.
+    APPEND SENDER TO MT_VEHICLES.
+  ENDMETHOD.
+
+  METHOD DISPLAY_ATTRIBUTES.
+    DATA:
+          LO_VEHICLE TYPE REF TO LCL_VEHICLE.
+
+    WRITE:
+      / ICON_TRANSPORT_PROPOSAL AS ICON,
+      MV_NAME.
+    WRITE: / 'HERE COMES THE VEHICLE LIST: '.
+    ULINE.
+    ULINE.
+
+    LOOP AT MT_VEHICLES INTO LO_VEHICLE.
+      LO_VEHICLE-&gt;DISPLAY_ATTRIBUTES( ).
+    ENDLOOP.
+  ENDMETHOD.
+ENDCLASS.               "LCL_RENTAL
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_02</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_02</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  프로그램 ZRSMRT01_02</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report  ZRSMRT01_02</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+include <a href ="zrsmrt01_02top.html">ZRSMRT01_02TOP</a>.    " global Data
+
+include <a href ="zrsmrt01_02s01.html">ZRSMRT01_02S01</a>.  " Selection Screens
+<font color ="#0000FF">* INCLUDE ZRSMRT01_02O01                          .  " PBO-Modules</font>
+<font color ="#0000FF">* INCLUDE ZRSMRT01_02I01                          .  " PAI-Modules</font>
+<font color ="#0000FF">* INCLUDE ZRSMRT01_02F01                          .  " FORM-Routines</font>
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* INITIALIZATION : Set default value</font>
+<font color ="#0000FF">**********************************************************************</font>
+INITIALIZATION.
+<font color ="#0000FF">*-- Set parameter value</font>
+  p_all = 'X'.
+
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* AT SELECTION-SCREEN OUTPUT</font>
+<font color ="#0000FF">**********************************************************************</font>
+AT SELECTION-SCREEN OUTPUT.
+  LOOP AT SCREEN.
+
+<font color ="#0000FF">*-- 라디오 버튼 체크 (대상 결정)</font>
+    CASE 'X'.
+      WHEN p_air.  " Show Airline ID & hide Connection ID
+        IF screen-group1 EQ 'CAR'.  " MODIF ID =&gt; CAR (대문자로 표기)
+          screen-active = 1.         " hide
+        ENDIF.
+        IF screen-group1 EQ 'CON'.  " MODIF ID =&gt; CON
+          screen-active = 0.          " show
+        ENDIF.
+      WHEN p_con.  " Show Connection ID & hide Airline ID
+        IF screen-group1 EQ 'CAR'.  " MODIF ID =&gt; CAR (대문자로 표기)
+          screen-active = 0.         " show
+        ENDIF.
+        IF screen-group1 EQ 'CON'.  " MODIF ID =&gt; CON
+          screen-active = 1.          " hide
+        ENDIF.
+      WHEN OTHERS.  " p_all : Display all
+        IF screen-group1 EQ 'CAR'.  " MODIF ID =&gt; CAR (대문자로 표기)
+          screen-active = 1.         " show
+        ENDIF.
+        IF screen-group1 EQ 'CON'.  " MODIF ID =&gt; CON
+          screen-active = 1.          " show
+        ENDIF.
+    ENDCASE.
+
+    MODIFY SCREEN.      " 바뀐 속성을 screen에 반영
+
+  ENDLOOP.
+
+<font color ="#0000FF">*Text elements</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* T01 Condition</font>
+<font color ="#0000FF">* T02 Sub Condition</font>
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* P_AA         America airline</font>
+<font color ="#0000FF">* P_AIR         Airline</font>
+<font color ="#0000FF">* P_ALL         All</font>
+<font color ="#0000FF">* P_CARRID         Airline ID</font>
+<font color ="#0000FF">* P_CON         Connection</font>
+<font color ="#0000FF">* P_CONNID         Connection ID</font>
+<font color ="#0000FF">* P_DL         Deutch</font>
+<font color ="#0000FF">* S_CTRYFR         City from</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

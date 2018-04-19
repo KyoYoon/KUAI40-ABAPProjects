@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_ALV_TEST</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_ALV_TEST</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  [SD] 영업문서 조회 Report</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report ZRSMRT01_ALV_TEST</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT zrsmrt01_alv_test.
+
+TYPE-POOLS : slis.
+
+DATA : BEGIN OF it OCCURS 0,
+         vbeln LIKE vbak-vbeln,
+         posnr LIKE vbap-posnr,
+         vkorg LIKE vbak-vkorg,
+         kunnr LIKE vbak-kunnr,
+         matnr LIKE vbap-matnr,
+         arktx LIKE vbap-arktx,
+         netwr LIKE vbap-netwr,
+       END OF it.
+
+
+DATA : ct_fieldcat TYPE  slis_t_fieldcat_alv.
+SELECT-OPTIONS : s_vbeln FOR it-vbeln.
+
+
+START-OF-SELECTION.
+
+  SELECT a~vbeln
+         posnr
+         vkorg
+         kunnr
+         matnr
+         arktx
+         b~netwr INTO TABLE it FROM vbak AS a INNER JOIN vbap AS b
+    ON a~vbeln = b~vbeln WHERE a~vbeln IN s_vbeln.
+
+
+  CALL FUNCTION 'REUSE_ALV_FIELDCATALOG_MERGE'
+    EXPORTING
+      i_program_name         = sy-repid
+      i_internal_tabname     = 'IT'
+<font color ="#0000FF">*     I_STRUCTURE_NAME       = 'IT'</font>
+<font color ="#0000FF">*     I_CLIENT_NEVER_DISPLAY = 'X'</font>
+      i_inclname             = sy-repid
+<font color ="#0000FF">*     I_BYPASSING_BUFFER     =</font>
+<font color ="#0000FF">*     I_BUFFER_ACTIVE        =</font>
+    CHANGING
+      ct_fieldcat            = ct_fieldcat
+    EXCEPTIONS
+      inconsistent_interface = 1
+      program_error          = 2
+      OTHERS                 = 3.
+  IF sy-subrc &lt;&gt; 0.
+<font color ="#0000FF">* Implement suitable error handling here</font>
+  ENDIF.
+
+  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+<font color ="#0000FF">*     I_INTERFACE_CHECK  = ' '</font>
+<font color ="#0000FF">*     I_BYPASSING_BUFFER = ' '</font>
+<font color ="#0000FF">*     I_BUFFER_ACTIVE    = ' '</font>
+      i_callback_program = sy-repid
+<font color ="#0000FF">*     I_CALLBACK_PF_STATUS_SET          = ' '</font>
+<font color ="#0000FF">*     I_CALLBACK_USER_COMMAND           = ' '</font>
+<font color ="#0000FF">*     I_CALLBACK_TOP_OF_PAGE            = ' '</font>
+<font color ="#0000FF">*     I_CALLBACK_HTML_TOP_OF_PAGE       = ' '</font>
+<font color ="#0000FF">*     I_CALLBACK_HTML_END_OF_LIST       = ' '</font>
+<font color ="#0000FF">*     I_STRUCTURE_NAME   =</font>
+<font color ="#0000FF">*     I_BACKGROUND_ID    = ' '</font>
+<font color ="#0000FF">*     I_GRID_TITLE       =</font>
+<font color ="#0000FF">*     I_GRID_SETTINGS    =</font>
+<font color ="#0000FF">*     IS_LAYOUT          =</font>
+      it_fieldcat        = ct_fieldcat
+<font color ="#0000FF">*     IT_EXCLUDING       =</font>
+<font color ="#0000FF">*     IT_SPECIAL_GROUPS  =</font>
+<font color ="#0000FF">*     IT_SORT            =</font>
+<font color ="#0000FF">*     IT_FILTER          =</font>
+<font color ="#0000FF">*     IS_SEL_HIDE        =</font>
+<font color ="#0000FF">*     I_DEFAULT          = 'X'</font>
+<font color ="#0000FF">*     I_SAVE             = ' '</font>
+<font color ="#0000FF">*     IS_VARIANT         =</font>
+<font color ="#0000FF">*     IT_EVENTS          =</font>
+<font color ="#0000FF">*     IT_EVENT_EXIT      =</font>
+<font color ="#0000FF">*     IS_PRINT           =</font>
+<font color ="#0000FF">*     IS_REPREP_ID       =</font>
+<font color ="#0000FF">*     I_SCREEN_START_COLUMN             = 0</font>
+<font color ="#0000FF">*     I_SCREEN_START_LINE               = 0</font>
+<font color ="#0000FF">*     I_SCREEN_END_COLUMN               = 0</font>
+<font color ="#0000FF">*     I_SCREEN_END_LINE  = 0</font>
+<font color ="#0000FF">*     I_HTML_HEIGHT_TOP  = 0</font>
+<font color ="#0000FF">*     I_HTML_HEIGHT_END  = 0</font>
+<font color ="#0000FF">*     IT_ALV_GRAPHICS    =</font>
+<font color ="#0000FF">*     IT_HYPERLINK       =</font>
+<font color ="#0000FF">*     IT_ADD_FIELDCAT    =</font>
+<font color ="#0000FF">*     IT_EXCEPT_QINFO    =</font>
+<font color ="#0000FF">*     IR_SALV_FULLSCREEN_ADAPTER        =</font>
+<font color ="#0000FF">* IMPORTING</font>
+<font color ="#0000FF">*     E_EXIT_CAUSED_BY_CALLER           =</font>
+<font color ="#0000FF">*     ES_EXIT_CAUSED_BY_USER            =</font>
+    TABLES
+      t_outtab           = it[]
+    EXCEPTIONS
+      program_error      = 1
+      OTHERS             = 2.
+  IF sy-subrc &lt;&gt; 0.
+<font color ="#0000FF">* Implement suitable error handling here</font>
+  ENDIF.
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* S_VBELN D       .</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

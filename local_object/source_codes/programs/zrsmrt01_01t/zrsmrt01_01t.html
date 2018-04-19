@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_01T</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_01T</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  연습용 프로그램 (Self Practice)</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report  ZRSMRT01_01T</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+include <a href ="zrsmrt01_01ttop.html">ZRSMRT01_01TTOP</a>.    " global Data
+
+<font color ="#0000FF">* INCLUDE ZRSMRT01_01TO01                         .  " PBO-Modules</font>
+<font color ="#0000FF">* INCLUDE ZRSMRT01_01TI01                         .  " PAI-Modules</font>
+<font color ="#0000FF">* INCLUDE ZRSMRT01_01TF01                         .  " FORM-Routines</font>
+
+DATA myvar TYPE i VALUE 6.
+DATA yourvar  TYPE p LENGTH 5 DECIMALS 2 VALUE '12345.67'.            " 9 bit = 5 * 2 - 1
+DATA(newvar) = '7.47'.    " inline data declaration
+newvar = newvar + 1.
+
+CONCATENATE newvar 'a' INTO DATA(result).
+
+"newvar = newvar + 1.
+
+DATA result2 TYPE i.
+result2 = CEIL( yourvar ).
+
+WRITE (*) 'Hello World'.
+WRITE: / 'my var is', (*) myvar NO-GAP, '.'.
+WRITE: / 'your var is', (*) yourvar NO-GAP, '.'.
+WRITE: / 'new var is', (*) newvar NO-GAP, '.'.
+WRITE: / 'result is', (*) result NO-GAP, '.'.
+WRITE: / 'result2 is', (*) result2 NO-GAP, '.'.
+WRITE / 'Hope you are having a good Monday.'.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

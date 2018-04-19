@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZBC402_INS_FLIGHT_LIST_OSQLTOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZBC402_INS_FLIGHT_LIST_OSQLTOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZBC402_INS_FLIGHT_LIST_OSQLTOP</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZBC402_INS_FLIGHT_LIST_OSQLTOP                    Report ZBC402_INS_FLIGHT_LIST_OSQL</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT ZBC402_INS_FLIGHT_LIST_OSQL MESSAGE-ID k5.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* TABLES Declaration</font>
+<font color ="#0000FF">**********************************************************************</font>
+TABLES : sflight.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Instance Variable Definition</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : go_alv_grid       TYPE REF TO cl_gui_alv_grid,  " for main screen
+       go_dock_cont      TYPE REF TO cl_gui_docking_container. " for docking contanier object
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Internal Table with No Header (Main)</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : gt_sflight TYPE TABLE OF sflight,
+       gs_sflight TYPE sflight.
+
+<font color ="#0000FF">*-- For ALV (Main)</font>
+DATA : gt_fcat   TYPE lvc_t_fcat,  " field catalog internal table
+       gs_fcat   TYPE lvc_s_fcat,  " field catalog structure
+       gt_sort   TYPE lvc_t_sort,  " Sorting
+       gs_sort   TYPE lvc_s_sort,  " Sorting
+       gs_layout TYPE lvc_s_layo.  " ALV Grid Layout
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Common Variable</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : gv_flag.
+DATA : gv_okcode  TYPE sy-ucomm.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

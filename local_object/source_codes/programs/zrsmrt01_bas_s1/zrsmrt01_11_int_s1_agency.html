@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_11_INT_S1_AGENCY</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_11_INT_S1_AGENCY</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZBC401_11_INT_S1_AGENCY</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*INTERFACE LIF_PARTNER.</font>
+<font color ="#0000FF">*  METHODS: DISPLAY_PARTNER.</font>
+<font color ="#0000FF">*  EVENTS: PARTNER_CREATED.</font>
+<font color ="#0000FF">*ENDINTERFACE.</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class LCL_TRAVEL_AGENCY</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_TRAVEL_AGENCY DEFINITION.
+  PUBLIC SECTION.
+    METHODS:
+      CONSTRUCTOR
+        IMPORTING
+          IV_NAME TYPE STRING,
+      DISPLAY_AGENCY_PARTNERS,
+      DISPLAY_ATTRIBUTES.
+
+  PRIVATE SECTION.
+    DATA:
+      MV_NAME     TYPE STRING,
+      MT_PARTNERS TYPE TABLE OF REF TO ZIF_11_PARTNER.
+
+    METHODS:
+      ON_PARTNER_CREATED FOR EVENT PARTNER_CREATED OF ZIF_11_PARTNER
+        IMPORTING SENDER.
+ENDCLASS.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class (Implementation)  LCL_TRAVEL_AGENCY</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_TRAVEL_AGENCY IMPLEMENTATION.
+  METHOD DISPLAY_ATTRIBUTES.
+    WRITE: / ICON_PRIVATE_FILES AS ICON,
+    'TRAVEL AGENCY:'(007), MV_NAME.
+    ULINE.
+    DISPLAY_AGENCY_PARTNERS( ).
+  ENDMETHOD.
+
+  METHOD DISPLAY_AGENCY_PARTNERS.
+    DATA:
+          LO_PARTNER TYPE REF TO ZIF_11_PARTNER.
+    WRITE:
+      'HERE ARE THE PARTNERS OF THE TRAVEL AGENCY:'(008).
+    ULINE.
+    LOOP AT MT_PARTNERS INTO LO_PARTNER.
+      LO_PARTNER-&gt;DISPLAY_PARTNER( ).
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD CONSTRUCTOR.
+    MV_NAME = IV_NAME.
+    SET HANDLER ON_PARTNER_CREATED FOR ALL INSTANCES.
+  ENDMETHOD.
+
+  METHOD ON_PARTNER_CREATED.
+    APPEND SENDER TO MT_PARTNERS.
+  ENDMETHOD.
+ENDCLASS.               "LCL_TRAVEL_AGENCY
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

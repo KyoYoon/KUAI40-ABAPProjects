@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_05_ALV</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_05_ALV</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  프로그램 ZRSMRT01_05_ALV</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report  ZRSMRT01_05_ALV</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+include <a href ="zrsmrt01_05_alvtop.html">zrsmrt01_05_alvtop</a>.     " global Data
+include <a href ="zrsmrt01_05_alvs01.html">zrsmrt01_05_alvs01</a>.     " Selection Screens
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* INITIALIZATION</font>
+<font color ="#0000FF">**********************************************************************</font>
+INITIALIZATION.
+  p_carrid = 'AZ'.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* START-OF-SELECTION</font>
+<font color ="#0000FF">**********************************************************************</font>
+START-OF-SELECTION.
+  CLEAR : gt_spfli, gs_spfli.
+  SELECT carrid connid countryfr cityfrom
+    airpfrom countryto cityto airpto fltime
+    deptime arrtime distance distid fltype period
+    INTO CORRESPONDING FIELDS OF TABLE gt_spfli
+    FROM spfli
+    WHERE carrid EQ p_carrid
+    AND connid IN s_connid
+    AND cityfrom IN s_cityfr.
+
+  IF sy-subrc EQ 0.
+    TRY.
+        CALL METHOD cl_salv_table=&gt;factory
+<font color ="#0000FF">*  EXPORTING</font>
+<font color ="#0000FF">*    list_display   = IF_SALV_C_BOOL_SAP=&gt;FALSE</font>
+<font color ="#0000FF">*    r_container    =</font>
+<font color ="#0000FF">*    container_name =</font>
+          IMPORTING
+            r_salv_table = go_alv
+          CHANGING
+            t_table      = gt_spfli.
+        go_alv-&gt;display( ).
+      CATCH cx_salv_msg .
+    ENDTRY.
+
+  ENDIF.
+
+<font color ="#0000FF">*Text elements</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* T01 Condition</font>
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* P_CARRID         Airline ID</font>
+<font color ="#0000FF">* S_CITYFR         City from</font>
+<font color ="#0000FF">* S_CONNID         Connection ID</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

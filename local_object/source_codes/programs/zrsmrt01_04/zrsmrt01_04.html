@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_04</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_04</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  프로그램 ZRSMRT01_04</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report  ZRSMRT01_04</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+include <a href ="zrsmrt01_04top.html">zrsmrt01_04top</a>.    " global Data
+
+include <a href ="zrsmrt01_04s01.html">zrsmrt01_04s01</a>.  " Selection Screens
+<font color ="#0000FF">* INCLUDE ZRSMRT01_04O01                          .  " PBO-Modules</font>
+<font color ="#0000FF">* INCLUDE ZRSMRT01_04I01                          .  " PAI-Modules</font>
+<font color ="#0000FF">* INCLUDE ZRSMRT01_04F01                          .  " FORM-Routines</font>
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* INITIALIZATION</font>
+<font color ="#0000FF">**********************************************************************</font>
+INITIALIZATION.
+<font color ="#0000FF">*-- Set Select-Options Parameter</font>
+  s_carrid-sign = 'I'.
+  s_carrid-option = 'EQ'.
+  s_carrid-low = 'LH'.
+
+  APPEND s_carrid.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* START-OF-SELECTION</font>
+<font color ="#0000FF">**********************************************************************</font>
+START-OF-SELECTION.
+
+<font color ="#0000FF">*-- Get base data</font>
+  CLEAR : gt_scarr, gs_scarr.
+
+<font color ="#0000FF">* DB Connection 을 하지 않아도 Query가 실행되는 것은 DB Interface 가 local buffering 작업을 수행하기 때문이다.</font>
+
+  SELECT carrid url carrname currcode            " INTO CORRESPONDING FIELDS OF TABLE 컬럼 이름만 맞으면 알아서 데이터가 삽입됨
+    INTO CORRESPONDING FIELDS OF TABLE gt_scarr  " INTO CORRESPONDING FIELDS OF gs_scarr =&gt; work area로 삽입할 때
+    FROM scarr
+    WHERE carrid IN s_carrid.
+
+  IF sy-subrc EQ 0.  " 데이터 추출이 성공했다면
+
+<font color ="#0000FF">*-- Print out the internal table</font>
+    LOOP AT gt_scarr INTO gs_scarr.
+
+      WRITE : /, gs_scarr-carrid, gs_scarr-carrname, gs_scarr-currcode, gs_scarr-url.  " / -&gt; 줄바꿈
+
+    ENDLOOP.
+
+
+  ENDIF.
+
+<font color ="#0000FF">* AT LINE-SELECTION. " 출력한 리스트 중 한 줄을 더블클릭하였을 때 AT LINE-SELECTION 이벤트가 발생하여</font>
+                     " 클릭한 컬럼의 위치는 Hide Buffer에 저장된다
+
+<font color ="#0000FF">*Text elements</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* T01 Condition</font>
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* S_CARRID         Airline ID</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

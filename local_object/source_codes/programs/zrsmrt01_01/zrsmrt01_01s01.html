@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_01S01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_01S01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_01S01</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZRSMRT01_01S01</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+SELECTION-SCREEN BEGIN OF BLOCK pa1 WITH FRAME TITLE gv_title.
+<font color ="#0000FF">*-- Single Parameter</font>
+  PARAMETERS : p_bukrs TYPE bkpf-bukrs OBLIGATORY MODIF ID buk,
+               p_gjahr TYPE bkpf-gjahr MODIF ID gjr.
+
+<font color ="#0000FF">*-- Check box</font>
+PARAMETERS : p_chk1 AS CHECKBOX,
+             p_chk2 AS CHECKBOX.
+
+SELECTION-SCREEN ULINE.
+
+<font color ="#0000FF">*-- Radio Button</font>
+PARAMETERS : p_rb1 RADIOBUTTON GROUP gr1 USER-COMMAND cp,   " USER COMMAND 를 설정하면 엔터키를 치지 않고 라디오 버튼 선택하는 것만으로 이벤트를 발생시킨다.
+             p_rb2 RADIOBUTTON GROUP gr1,
+             p_rb3 RADIOBUTTON GROUP gr1.
+
+SELECTION-SCREEN SKIP.
+
+PARAMETERS : p_gb1 RADIOBUTTON GROUP gr2,
+             p_gb2 RADIOBUTTON GROUP gr2,
+             p_gb3 RADIOBUTTON GROUP gr2.
+
+SELECTION-SCREEN ULINE.
+
+<font color ="#0000FF">*-- Select Options</font>
+SELECT-OPTIONS s_belnr FOR bkpf-belnr OBLIGATORY.    " TOP 부분에 TABLES : bkpf. 라고 선언하지 않으면 에러 발생
+
+SELECTION-SCREEN END OF BLOCK pa1.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

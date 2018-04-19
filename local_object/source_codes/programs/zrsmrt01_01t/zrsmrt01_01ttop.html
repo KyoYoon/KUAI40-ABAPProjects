@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_01TTOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_01TTOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_01TTOP</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZRSMRT01_01TTOP                                   Report ZRSMRT01_01T</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT zrsmrt01_01t.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Variable Declarations</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA: gv_age      TYPE i,                 " complete data type
+      gv_siblings TYPE i VALUE 7.         " w/ initialization
+
+DATA  state TYPE c LENGTH 2 VALUE 'TN'.     " incomplete
+
+DATA  state2 LIKE state.
+
+DATA: text_buffer TYPE string VALUE 'Text',
+      count TYPE i VALUE 1,
+      price TYPE p LENGTH 8 DECIMALS 2 VALUE '1.99'.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* New: Inline Data Declarations</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA(gv_age2) = 7.                  "data type inferred 데이터 타입 자동 추론 (int)
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

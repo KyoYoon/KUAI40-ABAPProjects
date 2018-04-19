@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_03TOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_03TOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_02TOP</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZRSMRT01_02TOP                                    Report ZRSMRT01_02</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT zrsmrt01_02.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* TABLES Declaration</font>
+<font color ="#0000FF">**********************************************************************</font>
+TABLES : spfli, sbook.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Common Variable</font>
+<font color ="#0000FF">* DATA [변수명] TYPE [유형] LENGTH [길이].</font>
+<font color ="#0000FF">* scarr, spfli, sflight, sbook</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : gv_carrid TYPE scarr-carrid,
+       gv_connid TYPE spfli-connid.
+
+DATA : gv_fldate    TYPE sflight-fldate,
+       gv_price     TYPE sflight-price,
+       gv_smoker    TYPE sbook-smoker,
+       gv_cityfrom  TYPE spfli-cityfrom,
+       gv_countryfr TYPE spfli-countryfr.
+
+DATA : gv_temp1    TYPE c LENGTH 3,
+       gv_temp2(3).                 " TYPE c LENGTH 3 - 따로 타입을 정하지 않으면 char 형
+
+DATA : gv_temp3     TYPE n LENGTH 10,  "
+       gv_tmep4(10) TYPE n.          " numeric character
+
+DATA : gv_date1     TYPE d.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Internal Table</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : gt_bkpf TYPE TABLE OF bkpf WITH HEADER LINE.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Header line Internal Table</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : BEGIN OF gt_data OCCURS 0,     " OCCURS 0 =&gt; internal table with header line 을 의미 (생략되면 internal table 이 아닌 work area)
+         carrid   TYPE sflight-carrid,
+         currency TYPE sflight-currency,
+         fldate   TYPE sflight-fldate,
+         price    TYPE sflight-price,
+       END OF gt_data.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* How to create Internal Table With No Header line, using work area</font>
+<font color ="#0000FF">* TYPE : SAP System에 물리적으로 존재하는 대상 참조시</font>
+<font color ="#0000FF">* LIKE : 프로그램 내에서 임의로 선언한 대상 참조시 (TYPE 의 영역도 포함)</font>
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* 1. 사용자 정의 work area를 생성한다.</font>
+DATA : BEGIN OF gs_data_no_headerline,
+         carrid   TYPE sflight-carrid,
+         currency TYPE sflight-currency,
+         fldate   TYPE sflight-fldate,
+         price    TYPE sflight-price,   " LIKE 로 바꾸어도 에러가 나지 않음
+       END OF gs_data_no_headerline.
+
+<font color ="#0000FF">* 2. Work area를 참조하는 Internal Table 생성 (no header line)</font>
+DATA : gt_data_no_headerline LIKE TABLE OF gs_data_no_headerline.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* work area</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : BEGIN OF gs_data,
+         name(10),
+         nation(3),
+         code(8)   TYPE n,
+         int_num   TYPE i,
+         float_num TYPE p LENGTH 12 DECIMALS 3,
+       END OF gs_data.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Class instance</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA : go_alv_grid  TYPE REF TO cl_gui_alv_grid,
+       go_container TYPE REF TO cl_gui_custom_container.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

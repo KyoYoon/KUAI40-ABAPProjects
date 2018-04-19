@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_01</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_01</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  연습용 프로그램</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report  ZRSMRT01_01</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+include <a href ="zrsmrt01_01top.html">zrsmrt01_01top</a>.    " global Data
+
+include <a href ="zrsmrt01_01s01.html">zrsmrt01_01s01</a>.  " Selection Screens
+<font color ="#0000FF">* INCLUDE ZRSMRT01_01F01                          .  " FORM-Routines</font>
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* INITIALIZATION : Set default value</font>
+<font color ="#0000FF">**********************************************************************</font>
+INITIALIZATION.
+<font color ="#0000FF">*-- Set parameter value</font>
+  gv_title = 'Condition'.
+  MOVE '1000' TO p_bukrs. "p_bukrs = '1000'.
+  p_chk2  = abap_true.    "MOVE 'X' TO p_chk2. (abap_true = 'X' - SAP standard 에서 제공해주는 상수)
+  p_rb3   = 'X'.
+
+<font color ="#0000FF">*-- Set select-options</font>
+  s_belnr-sign    = 'I'.      " Include, 'E' : Exclude
+  s_belnr-option  = 'EQ'.     " Equal
+  s_belnr-low     = '1234567'.
+
+  APPEND s_belnr.     " header line 이 있는 internal table 이라서 왼쪽과 같이 작성 (Internal Table With Header Line)
+
+  CLEAR s_belnr.      " 메모리 해제
+
+  s_belnr-sign    = 'E'.
+  s_belnr-option  = 'BT'.
+  s_belnr-low     = '5000'.
+  s_belnr-high    = '8000'.
+
+  APPEND s_belnr.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* AT SELECTION-SCREEN : Validation Check</font>
+<font color ="#0000FF">**********************************************************************</font>
+AT SELECTION-SCREEN.
+<font color ="#0000FF">*  IF p_bukrs &lt;&gt; '1000'.    " 산술연산자</font>
+  IF p_bukrs NE '1000'.     " 논리연산자
+
+<font color ="#0000FF">*    MESSAGE 'Invalid company' TYPE 'S'. " 창 하단에 녹색 표시</font>
+<font color ="#0000FF">*    MESSAGE 'Invalid company' TYPE 'I'. " 팝업 메시지</font>
+<font color ="#0000FF">*    MESSAGE 'Invalid company' TYPE 'E'. " 창 하단에 빨간 표시 - 화면이 막힐 수 있기 때문에 아래의 문장으로 표현</font>
+    MESSAGE 'Invalid company' TYPE 'S' DISPLAY LIKE 'E'. " 창 하단에 빨간 표시가 나면서 에러처럼 보이지만 화면이 막히지 않고 정상적으로 진행되는 성공 메시지
+
+
+  ENDIF.
+
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* AT SELECTION-SCREEN OUTPUT</font>
+<font color ="#0000FF">**********************************************************************</font>
+AT SELECTION-SCREEN OUTPUT.
+  LOOP AT SCREEN.
+
+    " SCREEN 의 GROUP1 으로 MODIF ID 를 볼 수 있음
+    CASE 'X'.     "어떤 라디오버튼을 선택했는가?
+      WHEN p_rb1. "Company Code
+        IF screen-group1 EQ 'BUK'.
+          screen-input = 0.   " Read-only 입력 제한 =&gt; 읽기 전용 or 편집가능 속성은 screen의 input이 담당하고 있음
+        ENDIF.
+        IF screen-group1 EQ 'GJR'.
+          screen-active = 1.  " Show =&gt; 화면에 나타날 지 말 지 결정하는 속성은 screen의 active
+        ENDIF.
+      WHEN p_rb2. "Year
+        IF screen-group1 EQ 'BUK'.
+          screen-input = 1.   " Edit Mode
+        ENDIF.
+        IF screen-group1 EQ 'GJR'.
+          screen-active = 0.  " Hide
+        ENDIF.
+
+    ENDCASE.
+
+    MODIFY SCREEN.    " 바뀐 속성을 현재 screen에 반영
+
+  ENDLOOP.
+
+
+<font color ="#0000FF">*Selection texts</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">* P_BUKRS         Company Code</font>
+<font color ="#0000FF">* P_CHK1         Check1</font>
+<font color ="#0000FF">* P_CHK2         Check2</font>
+<font color ="#0000FF">* P_GB1         Button1</font>
+<font color ="#0000FF">* P_GB2         Button2</font>
+<font color ="#0000FF">* P_GB3         Button3</font>
+<font color ="#0000FF">* P_GJAHR         Fiscal Year</font>
+<font color ="#0000FF">* P_RB1         Company Code</font>
+<font color ="#0000FF">* P_RB2         Fiscal Year</font>
+<font color ="#0000FF">* P_RB3         Both</font>
+<font color ="#0000FF">* S_BELNR         Document No</font>
+
+
+<font color ="#0000FF">*Messages</font>
+<font color ="#0000FF">*----------------------------------------------------------</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">* Message class: Hard coded</font>
+<font color ="#0000FF">*   Invalid company</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

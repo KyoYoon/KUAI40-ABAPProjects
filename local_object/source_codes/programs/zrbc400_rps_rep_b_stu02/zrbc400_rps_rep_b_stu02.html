@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRBC400_RPS_REP_B_STU02</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRBC400_RPS_REP_B_STU02</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  프로그램 ZRBC400_RPS_REP_B_STU01</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report  ZRBC400_RPS_REP_A_STU01</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+include <a href ="zrbc400_rps_rep_b_stu02top.html">ZRBC400_RPS_REP_B_STU02TOP</a>.
+<font color ="#0000FF">*INCLUDE zrbc400_rps_rep_a_stu02top.</font>
+<font color ="#0000FF">*INCLUDE zrbc400_rps_rep_a_stu01top              .    " global Data</font>
+
+include <a href ="zrbc400_rps_rep_b_stu02s01.html">ZRBC400_RPS_REP_B_STU02S01</a>.
+<font color ="#0000FF">*INCLUDE zrbc400_rps_rep_a_stu02s01.                   " Selection Screens</font>
+<font color ="#0000FF">* INCLUDE ZRBC400_RPS_REP_A_STU01O01              .  " PBO-Modules</font>
+<font color ="#0000FF">* INCLUDE ZRBC400_RPS_REP_A_STU01I01              .  " PAI-Modules</font>
+<font color ="#0000FF">* INCLUDE ZRBC400_RPS_REP_A_STU01F01              .  " FORM-Routines</font>
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* INITIALIZATION : Set default value</font>
+<font color ="#0000FF">**********************************************************************</font>
+INITIALIZATION.
+<font color ="#0000FF">*-- Set parameter value</font>
+  gv_title = 'Condition'.
+  pa_car = 'AA'.
+
+<font color ="#0000FF">*-- Set select-options</font>
+  so_con-sign    = 'I'.      " Include, 'E' : Exclude
+  so_con-option  = 'EQ'.     " Equal
+  so_con-low     = '0017'.
+
+  APPEND so_con.     " header line 이 있는 internal table 이라서 왼쪽과 같이 작성 (Internal Table With Header Line)
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* START-OF-SELECTION : Get SFLIGHT LIST</font>
+<font color ="#0000FF">**********************************************************************</font>
+START-OF-SELECTION.
+
+<font color ="#0000FF">*-- Call Function</font>
+  call function <a href ="zbc400_dds_flightlist_get_opt2/zbc400_dds_flightlist_get_opt2.html">'ZBC400_DDS_FLIGHTLIST_GET_OPT2'</a>
+    EXPORTING
+      iv_carrid  = pa_car
+      s_connid   = so_con
+    IMPORTING
+      et_flights = gt_flights
+    EXCEPTIONS
+      no_data    = 1
+      OTHERS     = 2.
+  IF sy-subrc &lt;&gt; 0.
+<font color ="#0000FF">* Implement suitable error handling here</font>
+    WRITE / 'No flights for selected flight connection'(non).
+  ENDIF.
+
+
+
+<font color ="#0000FF">*-- Print out list</font>
+  LOOP AT gt_flights INTO gs_flight.
+
+    NEW-LINE.
+    IF gs_flight-percentage &gt;= gc_limit_red.
+      WRITE icon_red_light AS ICON.
+    ELSEIF gs_flight-percentage &gt;= gc_limit_yellow.
+      WRITE icon_yellow_light AS ICON.
+    ELSE.
+      WRITE icon_green_light AS ICON.
+    ENDIF.
+
+    WRITE: gs_flight-carrid COLOR COL_KEY,
+          gs_flight-connid COLOR COL_KEY,
+          gs_flight-fldate COLOR COL_KEY,
+          gs_flight-seatsmax,
+          gs_flight-seatsocc,
+          gs_flight-percentage.
+
+
+  ENDLOOP.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_BAS_S1</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_BAS_S1</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report ZSAPBC401_BAS_S1</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT ZRSMRT01_BAS_S1.
+TYPE-POOLS: ICON.
+
+include <a href ="zrsmrt01_11_int_s1_agency.html">ZRSMRT01_11_INT_S1_AGENCY</a>.
+<font color ="#0000FF">*INCLUDE ZBC401_11_INT_S1_AGENCY.</font>
+include <a href ="zrsmrt01_11_int_s1_carrier.html">ZRSMRT01_11_INT_S1_CARRIER</a>.
+<font color ="#0000FF">*INCLUDE ZBC401_11_INT_S1_CARRIER.</font>
+include <a href ="zrsmrt01_11_int_s1_rental.html">ZRSMRT01_11_INT_S1_RENTAL</a>.
+<font color ="#0000FF">*INCLUDE ZBC401_11_INT_S1_RENTAL.</font>
+
+DATA:
+  GO_VEHICLE TYPE REF TO LCL_VEHICLE,
+  GO_TRUCK   TYPE REF TO LCL_TRUCK,
+  GO_BUS     TYPE REF TO LCL_BUS,
+  GO_RENTAL  TYPE REF TO LCL_RENTAL.
+
+DATA:
+  GO_ROOM      TYPE REF TO ZCL_11_ROOM,
+  GO_AIRPLANE  TYPE REF TO LCL_AIRPLANE,
+  GO_CARGO     TYPE REF TO LCL_CARGO_PLANE,
+  GO_PASSENGER TYPE REF TO LCL_PASSENGER_PLANE,
+  GO_CARRIER   TYPE REF TO LCL_CARRIER,
+  GO_AGENCY    TYPE REF TO LCL_TRAVEL_AGENCY,
+  GO_HOTEL     TYPE REF TO ZCL_11_HOTEL,
+  GV_COUNT     TYPE I.
+
+START-OF-SELECTION.
+
+<font color ="#0000FF">*  LCL_AIRPLANE=&gt;DISPLAY_N_O_AIRPLANES( ).</font>
+
+  CREATE OBJECT GO_AGENCY
+    EXPORTING
+      IV_NAME = 'TRAVEL&SMILE TRAVEL'.
+
+  CREATE OBJECT GO_HOTEL
+    EXPORTING
+      IV_NAME = 'SLEEP WELL HOTEL'
+<font color ="#0000FF">*     IV_BEDS = 345</font>
+    .
+
+  CREATE OBJECT GO_ROOM
+    EXPORTING
+      IV_NUMBER = '101'
+      IV_BEDS   = 1.
+
+  CREATE OBJECT GO_ROOM
+    EXPORTING
+      IV_NUMBER = '102'
+      IV_BEDS   = 2.
+
+  CREATE OBJECT GO_ROOM
+    EXPORTING
+      IV_NUMBER = '103'
+      IV_BEDS   = 3.
+
+  CREATE OBJECT GO_ROOM
+    EXPORTING
+      IV_NUMBER = '104'
+      IV_BEDS   = 4.
+
+  CREATE OBJECT GO_ROOM
+    EXPORTING
+      IV_NUMBER = '105'
+      IV_BEDS   = 2.
+
+  CREATE OBJECT GO_RENTAL
+    EXPORTING
+      IV_NAME = 'HAPPY CAR RENTAL'.
+
+<font color ="#0000FF">*  GO_AGENCY-&gt;ADD_PARTNER( GO_RENTAL ).</font>
+
+  CREATE OBJECT GO_TRUCK
+    EXPORTING
+      IV_CARGO = 45
+      IV_MAKE  = 'MAN'.
+
+<font color ="#0000FF">*  GO_RENTAL-&gt;ADD_VEHICLE( GO_TRUCK ).</font>
+
+  CREATE OBJECT GO_BUS
+    EXPORTING
+      IV_MAKE       = 'MERCEDES'
+      IV_PASSENGERS = 80.
+
+<font color ="#0000FF">*  GO_RENTAL-&gt;ADD_VEHICLE( GO_BUS ).</font>
+
+  CREATE OBJECT GO_TRUCK
+    EXPORTING
+      IV_CARGO = 48
+      IV_MAKE  = 'VOLVO'.
+
+<font color ="#0000FF">*  GO_RENTAL-&gt;ADD_VEHICLE( GO_TRUCK ).</font>
+
+  CREATE OBJECT GO_CARRIER
+    EXPORTING
+      IV_NAME = 'SMILE&FLY-TRAVEL'.
+
+<font color ="#0000FF">*  GO_AGENCY-&gt;ADD_PARTNER( GO_CARRIER ).</font>
+
+  CREATE OBJECT GO_PASSENGER
+    EXPORTING
+      IV_NAME         = 'LH BERLIN'
+      IV_PLANETYPE    = '747-400'
+      IV_SEATS        = 345
+    EXCEPTIONS
+      WRONG_PLANETYPE = 1.
+  IF SY-SUBRC EQ 0.
+<font color ="#0000FF">*    APPEND GO_PASSENGER TO GT_AIRPLANES.</font>
+<font color ="#0000FF">*    GO_CARRIER-&gt;ADD_AIRPLANE( GO_PASSENGER ).</font>
+  ELSE.
+    WRITE:
+      / ICON_FAILURE AS ICON,
+        'WRONG PLANE TYPE'.
+  ENDIF.
+
+  CREATE OBJECT GO_CARGO
+    EXPORTING
+      IV_CARGO        = 533
+      IV_NAME         = 'US HERCULES'
+      IV_PLANETYPE    = '747-200F'
+    EXCEPTIONS
+      WRONG_PLANETYPE = 1.
+
+  IF SY-SUBRC EQ 0.
+<font color ="#0000FF">*    APPEND GO_CARGO TO GT_AIRPLANES.</font>
+<font color ="#0000FF">*    GO_CARRIER-&gt;ADD_AIRPLANE( GO_CARGO ).</font>
+  ELSE.
+    WRITE:
+      / ICON_FAILURE AS ICON,
+        'WRONG PLANE TYPE'.
+  ENDIF.
+
+<font color ="#0000FF">*  GO_PASSENGER-&gt;DISPLAY_ATTRIBUTES( ).</font>
+<font color ="#0000FF">*  GO_CARGO-&gt;DISPLAY_ATTRIBUTES( ).</font>
+
+<font color ="#0000FF">*  LOOP AT GT_AIRPLANES INTO GO_AIRPLANE.</font>
+<font color ="#0000FF">*    GO_AIRPLANE-&gt;DISPLAY_ATTRIBUTES( ).</font>
+<font color ="#0000FF">*  ENDLOOP.</font>
+<font color ="#0000FF">*</font>
+  GO_AGENCY-&gt;DISPLAY_ATTRIBUTES( ).
+
+<font color ="#0000FF">*CLASS CL_HOTEL DEFINITION PUBLIC CREATE PUBLIC.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  PUBLIC SECTION.</font>
+<font color ="#0000FF">*    METHODS CONSTURCTOR</font>
+<font color ="#0000FF">*      IMPORTING</font>
+<font color ="#0000FF">*        !IV_NAME TYPE STRING</font>
+<font color ="#0000FF">*        !IV_BEDS TYPE I.</font>
+<font color ="#0000FF">*    METHODS DISPLAY_ATTRIBUTES.</font>
+<font color ="#0000FF">*    CLASS-METHODS DISPLAY_N_O_HOTELS.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  PROTECTED SECTION.</font>
+<font color ="#0000FF">*  PRIVATE SECTION.</font>
+<font color ="#0000FF">*    DATA MV_NAME TYPE STRING.</font>
+<font color ="#0000FF">*    CLASS-DATA GV_N_O_HOTELS TYPE I.</font>
+<font color ="#0000FF">*    DATA MV_BEDS TYPE I.</font>
+<font color ="#0000FF">*    CONSTANTS C_POS_1 TYPE I VALUE 30.</font>
+<font color ="#0000FF">*ENDCLASS.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*CLASS CL_HOTEL IMPLEMENTATION.</font>
+<font color ="#0000FF">*  METHOD CONSTRUCTOR.</font>
+<font color ="#0000FF">*    MV_NAME = IV_NAME.</font>
+<font color ="#0000FF">*    MV_BEDS = IV_BES.</font>
+<font color ="#0000FF">*    ADD 1 TO GV_N_O_HOTELS.</font>
+<font color ="#0000FF">*  ENDMETHOD.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  METHOD DISPLAY_ATTRIBUTES.</font>
+<font color ="#0000FF">*    WRITE:</font>
+<font color ="#0000FF">*      / 'HOTEL'(001),</font>
+<font color ="#0000FF">*      / 'TOTAL NUMBER OF BEDS:'(002), AT C_POS_1 MV_BEDS.</font>
+<font color ="#0000FF">*    ULINE.</font>
+<font color ="#0000FF">*    ULINE.</font>
+<font color ="#0000FF">*    SKIP.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  ENDMETHOD.</font>
+<font color ="#0000FF">*</font>
+<font color ="#0000FF">*  METHOD DISPLAY_N_O_HOTELS.</font>
+<font color ="#0000FF">*    WRITE:</font>
+<font color ="#0000FF">*      / 'TOTAL NUMBER OF HOTELS'(003), GV_N_O_HOTELS.</font>
+<font color ="#0000FF">*  ENDMETHOD.</font>
+<font color ="#0000FF">*ENDCLASS.</font>
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

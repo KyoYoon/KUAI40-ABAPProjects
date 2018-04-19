@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_01TOP</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_01TOP</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  Include ZRSMRT01_01TOP</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Include ZRSMRT01_01TOP                                    Report ZRSMRT01_01</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+REPORT zrsmrt01_01.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* TABLES Declaration</font>
+<font color ="#0000FF">**********************************************************************</font>
+TABLES : bkpf.
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Common Variable</font>
+<font color ="#0000FF">* DATA [변수명] TYPE [유형] LENGTH [길이].</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA gv_cnt       TYPE i.             " 정수형 (Integer) 실무
+
+<font color ="#0000FF">*--------------------------------------------------------------------*</font>
+DATA gv_name      TYPE c LENGTH 10.   " According to the Bible
+DATA gv_name2(10) TYPE c.
+DATA gv_name3(10).                    " 실무
+<font color ="#0000FF">*--------------------------------------------------------------------*</font>
+
+DATA gv_num       TYPE n LENGTH 5.                " Numeric Character Type
+DATA gv_num2(5)   TYPE n.                         " 실무
+
+DATA gv_amt       TYPE p LENGTH 13 DECIMALS 2.    " Packed Type
+DATA gv_amt2(13)  TYPE p DECIMALS 2.              " 실무
+
+DATA gv_date      TYPE d.                         " 날짜 DATS - yyMMdd
+DATA gv_time      TYPE t.                         " 타임 TIMS - HH:MM:SS
+
+<font color ="#0000FF">**********************************************************************</font>
+<font color ="#0000FF">* Class instance</font>
+<font color ="#0000FF">**********************************************************************</font>
+DATA go_alv_grid  TYPE REF TO cl_gui_alv_grid.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

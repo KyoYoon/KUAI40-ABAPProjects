@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_11_INT_S1_CARRIER</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_11_INT_S1_CARRIER</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&  Include           ZBC401_11_INT_S1_CARRIER</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class LCL_AIRPLANE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_AIRPLANE DEFINITION.
+  PUBLIC SECTION.
+    METHODS:
+      CONSTRUCTOR
+        IMPORTING
+          IV_NAME      TYPE STRING
+          IV_PLANETYPE TYPE SAPLANE-PLANETYPE
+        EXCEPTIONS
+          WRONG_PLANETYPE,
+      DISPLAY_ATTRIBUTES.
+    CLASS-METHODS:
+      CLASS_CONSTRUCTOR,
+      DISPLAY_N_O_AIRPLANES,
+      GET_N_O_AIRPLANES RETURNING VALUE(RV_COUNT) TYPE I.
+    EVENTS:
+      AIRPLANE_CREATED.
+
+  PROTECTED SECTION.
+    CONSTANTS:
+      C_POS_1 TYPE I VALUE 30.
+
+  PRIVATE SECTION.
+    TYPES:
+      TY_PLANETYPES TYPE STANDARD TABLE OF SAPLANE
+      WITH NON-UNIQUE KEY PLANETYPE.
+
+    DATA:
+      MV_NAME      TYPE STRING,
+      MV_PLANETYPE TYPE SAPLANE-PLANETYPE,
+      MV_WEIGHT    TYPE SAPLANE-WEIGHT,
+      MV_TANKCAP   TYPE SAPLANE-TANKCAP.
+
+    CLASS-DATA:
+      GV_N_O_AIRPLANES TYPE I,
+      GT_PLANETYPES    TYPE TY_PLANETYPES.
+
+    CLASS-METHODS:
+      GET_TECHNICAL_ATTRIBUTES
+        IMPORTING
+          IV_TYPE    TYPE SAPLANE-PLANETYPE
+        EXPORTING
+          EV_WEIGHT  TYPE SAPLANE-WEIGHT
+          EV_TANKCAP TYPE SAPLANE-TANKCAP
+        EXCEPTIONS
+          WRONG_PLANETYPE.
+ENDCLASS.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class (Implementation)  LCL_AIRPLANE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_AIRPLANE IMPLEMENTATION.
+  METHOD CLASS_CONSTRUCTOR.
+    SELECT * FROM SAPLANE INTO TABLE GT_PLANETYPES.
+  ENDMETHOD.
+
+  METHOD CONSTRUCTOR.
+    MV_NAME = IV_NAME.
+    MV_PLANETYPE = IV_PLANETYPE.
+
+    GET_TECHNICAL_ATTRIBUTES(
+      EXPORTING
+        IV_TYPE = IV_PLANETYPE
+      IMPORTING
+        EV_WEIGHT = MV_WEIGHT
+        EV_TANKCAP = MV_TANKCAP
+       EXCEPTIONS
+         WRONG_PLANETYPE = 1 ).
+
+    IF SY-SUBRC NE 0.
+      RAISE WRONG_PLANETYPE.
+    ELSE.
+      GV_N_O_AIRPLANES = GV_N_O_AIRPLANES + 1.
+      RAISE EVENT AIRPLANE_CREATED.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD DISPLAY_ATTRIBUTES.
+    WRITE:
+      / ICON_WS_PLANE AS ICON,
+      / 'NAME OF AIRPLANE'(001), AT C_POS_1 MV_NAME,
+      / 'TYPE OF AIRPLANE:'(002), AT C_POS_1 MV_PLANETYPE,
+      / 'WEIGHT:'(003), AT C_POS_1 MV_WEIGHT LEFT-JUSTIFIED,
+      / 'TANK CAPACITY:'(004), AT C_POS_1 MV_TANKCAP LEFT-JUSTIFIED.
+  ENDMETHOD.
+
+  METHOD DISPLAY_N_O_AIRPLANES.
+    SKIP.
+    WRITE:
+      / 'NUMBER OF AIRPLANES:'(CAL),
+        AT C_POS_1 GV_N_O_AIRPLANES LEFT-JUSTIFIED.
+  ENDMETHOD.
+
+  METHOD GET_N_O_AIRPLANES.
+    RV_COUNT = GV_N_O_AIRPLANES.
+  ENDMETHOD.
+
+  METHOD GET_TECHNICAL_ATTRIBUTES.
+    DATA: LS_PLANETYPE TYPE SAPLANE.
+
+    READ TABLE GT_PLANETYPES INTO LS_PLANETYPE
+    WITH TABLE KEY PLANETYPE = IV_TYPE
+    TRANSPORTING WEIGHT TANKCAP.
+
+    IF SY-SUBRC EQ 0.
+      EV_WEIGHT = LS_PLANETYPE-WEIGHT.
+      EV_TANKCAP = LS_PLANETYPE-TANKCAP.
+    ELSE.
+      RAISE WRONG_PLANETYPE.
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.               "LCL_AIRPLANE
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class LCL_CARGO_PLANE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_CARGO_PLANE DEFINITION INHERITING FROM LCL_AIRPLANE.
+  PUBLIC SECTION.
+    METHODS:
+      CONSTRUCTOR
+        IMPORTING
+          IV_NAME      TYPE STRING
+          IV_PLANETYPE TYPE SAPLANE-PLANETYPE
+          IV_CARGO     TYPE S_PLAN_CAR
+        EXCEPTIONS
+          WRONG_PLANETYPE,
+
+      DISPLAY_ATTRIBUTES REDEFINITION,
+      GET_CARGO RETURNING VALUE(RV_CARGO) TYPE S_PLAN_CAR.
+
+  PRIVATE SECTION.
+    DATA:
+          MV_CARGO TYPE S_PLAN_CAR.
+ENDCLASS.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class (Implementation)  LCL_CARGO_PLANE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_CARGO_PLANE IMPLEMENTATION.
+  METHOD CONSTRUCTOR.
+    SUPER-&gt;CONSTRUCTOR(
+      EXPORTING
+        IV_NAME = IV_NAME
+        IV_PLANETYPE = IV_PLANETYPE
+      EXCEPTIONS
+        WRONG_PLANETYPE = 1 ).
+    IF SY-SUBRC NE 0.
+      RAISE WRONG_PLANETYPE.
+    ENDIF.
+    MV_CARGO = IV_CARGO.
+  ENDMETHOD.
+
+  METHOD DISPLAY_ATTRIBUTES.
+    SUPER-&gt;DISPLAY_ATTRIBUTES( ).
+    WRITE:
+      / 'MAX CARGO:'(005), AT C_POS_1 MV_CARGO LEFT-JUSTIFIED.
+    ULINE.
+  ENDMETHOD.
+
+  METHOD GET_CARGO.
+    RV_CARGO = MV_CARGO.
+  ENDMETHOD.
+ENDCLASS.               "LCL_CARGO_PLANE
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class LCL_PASSENGER_PLANE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_PASSENGER_PLANE DEFINITION INHERITING FROM LCL_AIRPLANE.
+  PUBLIC SECTION.
+    METHODS:
+      CONSTRUCTOR
+        IMPORTING
+          IV_NAME      TYPE STRING
+          IV_PLANETYPE TYPE SAPLANE-PLANETYPE
+          IV_SEATS     TYPE S_SEATSMAX
+        EXCEPTIONS
+          WRONG_PLANETYPE,
+      DISPLAY_ATTRIBUTES REDEFINITION.
+
+  PRIVATE SECTION.
+    DATA: MV_SEATS TYPE S_SEATSMAX.
+ENDCLASS.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class (Implementation)  LCL_PASSENGER_PLANE</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_PASSENGER_PLANE IMPLEMENTATION.
+  METHOD CONSTRUCTOR.
+    SUPER-&gt;CONSTRUCTOR(
+      EXPORTING
+        IV_NAME = IV_NAME
+        IV_PLANETYPE = IV_PLANETYPE
+      EXCEPTIONS
+        WRONG_PLANETYPE = 1 ).
+    IF SY-SUBRC NE 0.
+      RAISE WRONG_PLANETYPE.
+    ENDIF.
+    MV_SEATS = IV_SEATS.
+  ENDMETHOD.
+
+  METHOD DISPLAY_ATTRIBUTES.
+    SUPER-&gt;DISPLAY_ATTRIBUTES( ).
+    WRITE:
+      / 'MAX SEATS:'(006), AT C_POS_1 MV_SEATS LEFT-JUSTIFIED.
+    ULINE.
+  ENDMETHOD.
+ENDCLASS.               "LCL_PASSENGER_PLANE
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class LCL_CARRIER</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_CARRIER DEFINITION.
+  PUBLIC SECTION.
+    INTERFACES:
+      ZIF_11_PARTNER.
+
+    METHODS:
+      CONSTRUCTOR
+        IMPORTING
+          IV_NAME TYPE STRING,
+          ON_AIRPLANE_CREATED FOR EVENT AIRPLANE_CREATED OF LCL_AIRPLANE
+          IMPORTING
+            SENDER,
+      DISPLAY_ATTRIBUTES.
+
+
+  PRIVATE SECTION.
+    DATA:
+      MV_NAME      TYPE STRING,
+      MT_AIRPLANES TYPE TABLE OF REF TO LCL_AIRPLANE.
+
+    METHODS:
+      DISPLAY_AIRPLANES,
+      GET_MAX_CARGO RETURNING VALUE(RV_MAX_CARGO) TYPE S_PLAN_CAR.
+ENDCLASS.
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&       Class (Implementation)  LCL_CARRIER</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*        Text</font>
+<font color ="#0000FF">*----------------------------------------------------------------------*</font>
+CLASS LCL_CARRIER IMPLEMENTATION.
+  METHOD CONSTRUCTOR.
+    MV_NAME = IV_NAME.
+    SET HANDLER ON_AIRPLANE_CREATED FOR ALL INSTANCES.
+    RAISE EVENT ZIF_11_PARTNER~PARTNER_CREATED.
+  ENDMETHOD.
+
+  METHOD DISPLAY_ATTRIBUTES.
+    SKIP 2.
+    WRITE: ICON_FLIGHT AS ICON, MV_NAME.
+    ULINE.
+    ULINE.
+<font color ="#0000FF">*    ME-&gt;DISPLAY_AIRPLANES( ).</font>
+    DISPLAY_AIRPLANES( ).
+  ENDMETHOD.
+
+  METHOD DISPLAY_AIRPLANES.
+    DATA:
+          LO_PLANE TYPE REF TO LCL_AIRPLANE.
+    LOOP AT MT_AIRPLANES INTO LO_PLANE.
+      LO_PLANE-&gt;DISPLAY_ATTRIBUTES( ).
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD GET_MAX_CARGO.
+    DATA:
+      LO_PLANE TYPE REF TO LCL_AIRPLANE,
+      LO_CARGO TYPE REF TO LCL_CARGO_PLANE.
+
+    LOOP AT MT_AIRPLANES INTO LO_PLANE.
+      TRY.
+          LO_CARGO ?= LO_PLANE.
+          IF RV_MAX_CARGO &lt; LO_CARGO-&gt;GET_CARGO( ).
+            RV_MAX_CARGO = LO_CARGO-&gt;GET_CARGO( ).
+          ENDIF.
+        CATCH CX_SY_MOVE_CAST_ERROR.
+<font color ="#0000FF">*        DO NOTHING</font>
+      ENDTRY.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD ZIF_11_PARTNER~DISPLAY_PARTNER.
+<font color ="#0000FF">*    ME-&gt;DISPLAY_ATTRIBUTES( ).</font>
+    DISPLAY_ATTRIBUTES( ).
+  ENDMETHOD.
+
+  METHOD ON_AIRPLANE_CREATED.
+    APPEND SENDER TO MT_AIRPLANES.
+  ENDMETHOD.
+ENDCLASS.               "LCL_CARRIER
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>

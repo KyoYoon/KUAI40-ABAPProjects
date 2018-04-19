@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>ZRSMRT01_07</title>
+</head>
+<body bgcolor="#FFFFE0">
+<font size="3" face = "Arial" color="#000000"><b>Code listing for: ZRSMRT01_07</b></font>
+<br>
+<font size="3" face = "Arial" color="#000000"><b>Description:  프로그램 ZRSMRT01_07</b></font>
+<hr>
+<pre width="100">
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*& Report  ZRSMRT01_07</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&</font>
+<font color ="#0000FF">*&---------------------------------------------------------------------*</font>
+
+include <a href ="zrsmrt01_07top.html">ZRSMRT01_07TOP</a>.    " global Data
+
+<font color ="#0000FF">* INCLUDE ZRSMRT01_07O01                          .  " PBO-Modules</font>
+<font color ="#0000FF">* INCLUDE ZRSMRT01_07I01                          .  " PAI-Modules</font>
+<font color ="#0000FF">* INCLUDE ZRSMRT01_07F01                          .  " FORM-Routines</font>
+
+START-OF-SELECTION.
+
+  DO dan TIMES.
+
+    DO dan TIMES.
+
+      cal = num * mul.
+
+      WRITE : /, num, ' * ', mul, ' = ', cal.
+      mul = mul + 1.
+
+    ENDDO.
+    mul = 1.
+    num = num + 1.
+    WRITE sy-uline.
+    NEW-LINE.
+
+  ENDDO.
+</pre>
+<hr>
+<font size="2" face = "Sans Serif">Extracted by Direct Download Enterprise version 1.3.1 - E.G.Mellodew. 1998-2005 UK. Sap Release 750
+</font>
+</body>
+</html>
