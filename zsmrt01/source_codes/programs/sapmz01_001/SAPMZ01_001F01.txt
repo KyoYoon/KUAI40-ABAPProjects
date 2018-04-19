@@ -1,0 +1,160 @@
+﻿*&---------------------------------------------------------------------*
+*&  Include           SAPMZ01_001F01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  SHOW_URL
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM show_url .
+
+  CLEAR gv_url.
+  DATA : lv_url   TYPE scarr-url.
+
+  SELECT SINGLE url INTO lv_url
+    FROM scarr
+    WHERE carrid EQ gv_carrid.
+
+  IF sy-subrc EQ 0.
+    gv_url = lv_url.
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  DISPLAY_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM display_screen .
+
+*-- Define Field Catalog for Popup Screen
+  CLEAR : gt_fcat, gs_fcat.
+
+
+*-- Display result data on screen 110
+  IF go_cust_cont IS INITIAL.
+
+    PERFORM create_object.
+
+*-- ALV layout 설정
+    PERFORM set_layout.
+
+*-- Display ALV Grid
+    CALL METHOD go_alv_grid->set_table_for_first_display
+      EXPORTING
+*       i_buffer_active =
+*       i_bypassing_buffer            =
+*       i_consistency_check           =
+       i_structure_name              = 'SBOOK'
+*       is_variant      =
+        i_save          = 'A'
+        i_default       = 'X'
+        is_layout       = gs_layout
+*       is_print        =
+*       it_special_groups             =
+*       it_toolbar_excluding          =
+*       it_hyperlink    =
+*       it_alv_graphics =
+*       it_except_qinfo =
+*       ir_salv_adapter =
+      CHANGING
+        it_outtab       = gt_sbook
+*        it_fieldcatalog = gt_fcat_popup
+*       it_sort         =
+*       it_filter       =
+*      EXCEPTIONS
+*       invalid_parameter_combination = 1
+*       program_error   = 2
+*       too_many_lines  = 3
+*       others          = 4
+      .
+
+  ELSE.
+
+*-- ALV Grid Refresh
+    CALL METHOD go_alv_grid->refresh_table_display.
+
+  ENDIF.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CLEAR_SCREEN
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM clear_screen .
+
+" Free ALV Grid & Custom Container
+  CALL METHOD : go_alv_grid->free,
+                go_cust_cont->free.
+
+  FREE : go_alv_grid, go_cust_cont.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  CREATE_OBJECT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM create_object .
+
+*-- create custom container
+  CREATE OBJECT go_cust_cont
+    EXPORTING
+      container_name = 'MAIN_CONT'.
+
+
+
+*-- create alv grid
+  CREATE OBJECT go_alv_grid
+    EXPORTING
+*     i_shellstyle      = 0
+*     i_lifetime        =
+      i_parent = go_cust_cont.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  SET_LAYOUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM set_layout .
+
+  gs_layout-zebra       = 'X'.  " Line separator
+  gs_layout-cwidth_opt  = 'X'.  " Width Optimization
+  gs_layout-sel_mode    = 'D'.  " Multi selection
+  gs_layout-grid_title  = 'Booking Information'.  " Grid title
+  gs_layout-smalltitle  = 'X'.  " Small title
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*&      Form  GET_SBOOK_DATA
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*  -->  p1        text
+*  <--  p2        text
+*----------------------------------------------------------------------*
+FORM get_sbook_data .
+
+  CLEAR gt_sbook.
+  SELECT * INTO CORRESPONDING FIELDS OF TABLE gt_sbook
+    FROM sbook
+    WHERE carrid EQ gv_carrid.
+
+ENDFORM.

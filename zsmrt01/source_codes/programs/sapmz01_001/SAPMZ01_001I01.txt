@@ -1,0 +1,59 @@
+﻿*&---------------------------------------------------------------------*
+*&  Include           SAPMZ01_001I01
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  EXIT  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE exit INPUT.
+
+  " Free ALV Grid & Custom Container
+  IF go_alv_grid IS NOT INITIAL AND go_cust_cont IS NOT INITIAL.
+    PERFORM clear_screen.
+  ENDIF.
+
+  " Selection screen 이 없기 때문에 바로 프로그램을 나가면 된다.
+  LEAVE PROGRAM.
+
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  SET_VALUE  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE set_value INPUT.
+
+  IF gv_carrid IS NOT INITIAL.
+    PERFORM show_url.
+
+*-- Get Sbook DATA
+    PERFORM get_sbook_data.
+
+*-- Show ALV Grid using Custom Container
+    IF gt_sbook IS NOT INITIAL.
+      PERFORM display_screen.
+    ELSE.
+      MESSAGE s037 DISPLAY LIKE 'E'.  " 데이터가 없습니다.
+
+      IF go_alv_grid IS NOT INITIAL AND go_cust_cont IS NOT INITIAL.
+        PERFORM clear_screen.
+      ENDIF.
+    ENDIF.
+
+  ELSE.
+    MESSAGE s001 WITH TEXT-i01 DISPLAY LIKE 'E'. "Airline ID 를 입력하여 주십시오.
+    CLEAR gv_url.
+    IF go_alv_grid IS NOT INITIAL AND go_cust_cont IS NOT INITIAL.
+      PERFORM clear_screen.
+    ENDIF.
+
+  ENDIF.
+
+  IF gv_smoker EQ 'X'.
+    gv_icon = icon_activate.
+  ELSE.
+    gv_icon = ' '.
+  ENDIF.
+
+ENDMODULE.

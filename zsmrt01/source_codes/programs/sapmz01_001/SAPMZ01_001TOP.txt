@@ -1,0 +1,35 @@
+﻿*&---------------------------------------------------------------------*
+*& Include SAPMZ01_001TOP                                    모듈풀              SAPMZ01_001
+*&
+*&---------------------------------------------------------------------*
+PROGRAM SAPMZ01_001 MESSAGE-ID k5.
+
+**********************************************************************
+* For screen input field
+**********************************************************************
+DATA : gv_carrid  TYPE scarr-carrid,
+       gv_url     TYPE scarr-url,
+       gv_smoker  TYPE sbook-smoker,
+       gv_icon    TYPE icon-id.
+
+**********************************************************************
+* Instance Variable Definition
+**********************************************************************
+DATA : go_alv_grid       TYPE REF TO cl_gui_alv_grid,  " for main screen
+       go_cust_cont      TYPE REF TO cl_gui_custom_container.  " for custom container object
+
+**********************************************************************
+* Internal Table with No Header (Main)
+**********************************************************************
+DATA : gt_sbook TYPE TABLE OF sbook,
+       gs_sbook TYPE sbook.
+
+*-- For ALV
+DATA : gt_fcat         TYPE lvc_t_fcat,  " field catalog internal table
+       gs_fcat         TYPE lvc_s_fcat,  " field catalog structure
+       gs_layout       TYPE lvc_s_layo.  " ALV Grid Layout
+
+**********************************************************************
+* Common Variable
+**********************************************************************
+DATA : gv_okcode  TYPE sy-ucomm.
